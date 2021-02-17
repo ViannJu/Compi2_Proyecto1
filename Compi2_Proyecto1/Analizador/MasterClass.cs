@@ -23,9 +23,21 @@ namespace Compi2_Proyecto1.Analizador
             }
         }
 
-        public void addMessage(string mensaje)
+        /*
+         * @param mensaje: el mensaje que se quiere concatenar para la salida
+         * @param salto: indica si existe salto de linea 
+         */
+        public void addMessage(string mensaje, Boolean salto)
         {
-            this.mensajes += "\n" + mensaje;
+            if (salto)
+            {
+                //añadimos salto
+                this.mensajes += "\n" + mensaje;
+            }
+            else {
+                this.mensajes += mensaje;
+            }
+            
         }
 
         public string getMessages()
@@ -49,9 +61,9 @@ namespace Compi2_Proyecto1.Analizador
             this.instrucciones = new LinkedList<Instruccion>();
         }
 
-        public void addInstruction(Instruccion nodo)
+        public void addInstruction(Instruccion instruccion)
         {
-            this.instrucciones.AddLast(nodo);
+            this.instrucciones.AddLast(instruccion);
         }
 
         public int getCantidad()

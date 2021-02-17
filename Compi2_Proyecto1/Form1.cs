@@ -39,7 +39,7 @@ namespace Compi2_Proyecto1
             Evaluador evaluator = new Evaluador();
             evaluator.analizar(this.richTextBox1.Text);
             //MessageBox.Show(MasterClass.Instance.getMessages()+"\nCantidad de instrucciones: "+MasterClass.Instance.getCantidad());
-            //MasterClass.Instance.ejecutar();
+            MasterClass.Instance.ejecutar();
             this.richTextBox3.Text = MasterClass.Instance.getMessages();
         }
     }

@@ -48,16 +48,22 @@ namespace Compi2_Proyecto1.Analizador
 
             var tString = ToTerm("string");
             var tint = ToTerm("int");
+            var tinteger = ToTerm("integer");
             var treal = ToTerm("real");
             var tboolean = ToTerm("boolean");
             var tvoid = ToTerm("void");
             var ttype = ToTerm("type");//?
             var tobject = ToTerm("object");//?
             var tarray = ToTerm("array");//?
+            var ttrue = ToTerm("true");
+            var tfalse = ToTerm("false");
 
             var ptcoma = ToTerm(";");
             var dospuntos = ToTerm(":");
             var coma = ToTerm(",");
+
+            var tvar = ToTerm("var");
+
             #endregion
 
             #region PRIORIDAD
@@ -94,19 +100,21 @@ namespace Compi2_Proyecto1.Analizador
             INICIO.Rule = L_INSTRUCCIONES;
 
             L_INSTRUCCIONES.Rule = L_INSTRUCCIONES + INSTRUCCION + ptcoma
-                | INSTRUCCION + ptcoma
-                //| DECLARACION
-                //| ASIGNACION
+                | INSTRUCCION + ptcoma               
                 ;
 
             INSTRUCCION.Rule = E
-                //|ASIGNACION
+                | DECLARACION
+                //| ASIGNACION
                 ;
 
-            //DECLARACION.Rule = L_IDS + dospuntos + TIPO;
+            DECLARACION.Rule = tvar + L_IDS + dospuntos + TIPO
+                | tvar + ID + dospuntos + TIPO + igualdad + E
+                ;
 
             TIPO.Rule = tString
                 |tint
+                |tinteger
                 |treal
                 |tboolean
                 |tvoid
@@ -121,6 +129,9 @@ namespace Compi2_Proyecto1.Analizador
                 |E + por + E
                 |E + dividido + E
                 |num
+                |real
+                |ttrue
+                |tfalse
                 ;
 
             L_IDS.Rule = L_IDS + coma + ID

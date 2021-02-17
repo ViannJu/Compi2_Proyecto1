@@ -35,6 +35,10 @@ namespace Compi2_Proyecto1.Principales
             return this;
         }
 
+        public enumTipo getTipo() {
+            return this.tipo;
+        }
+
         public enum enumTipo { 
             //los tipos de primitivos
             entero, real, cadena, booleano, Void, Null, error, MF, Objecto 
