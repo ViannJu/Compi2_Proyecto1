@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-
+using System.Windows.Forms;
 
 namespace Compi2_Proyecto1.Expresiones
 {
@@ -23,10 +23,11 @@ namespace Compi2_Proyecto1.Expresiones
 
         public override Expresion getValor(Entorno ent)
         {
-
+            MessageBox.Show("Estoy en el get valor de la variable "+id);
             Variable sim = ent.buscar(id, linea, columna, "La variable");
             if (sim != null)
             { //Si se encontró la variable
+                MessageBox.Show("Si se encontro la variable " + id);
                 Primitivo retorno = new Primitivo(sim.tipo, sim.valor);
                 //retorna tal cual el valor
                 return retorno;

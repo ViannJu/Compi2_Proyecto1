@@ -50,24 +50,28 @@ namespace Compi2_Proyecto1.Instrucciones
 
                         variable = new Variable(this.tipo, resultado.valor);
                         ent.insertar(id, variable, linea, columna, "La variable");
+                        //MessageBox.Show("La variable "+id+" insertada en el entorno de tipo entero");
                         return null;
 
                     case Tipo.enumTipo.real:
 
                         variable = new Variable(this.tipo, resultado.valor);
                         ent.insertar(id, variable, linea, columna, "La variable");
+                        //MessageBox.Show("La variable " + id + " insertada en el entorno de tipo real");
                         return null;
 
                     case Tipo.enumTipo.cadena:
 
                         variable = new Variable(this.tipo, resultado.valor);
                         ent.insertar(id, variable, linea, columna, "La variable");
+                        //MessageBox.Show("La variable " + id + " insertada en el entorno de tipo cadena");
                         return null;
 
                     case Tipo.enumTipo.booleano:
 
                         variable = new Variable(this.tipo, resultado.valor);
                         ent.insertar(id, variable, linea, columna, "La variable");
+                        //MessageBox.Show("La variable " + id + " insertada en el entorno de tipo booleano");
                         return null;
                 }
 

@@ -4,16 +4,23 @@ using System.Text;
 
 namespace Compi2_Proyecto1.Principales
 {
-    public class Primitivo : Expresion
+    /*  Clase simple solamente para retornar el valor primitivo y enviarlo a
+     *  evaluador   (solo par encapsular)
+     * 
+     */
+
+    public class ValorConstante : Expresion
     {
-        public Primitivo(Tipo tipo, Object valor) {
-            this.tipo = tipo;
+        Expresion valor;
+
+        public ValorConstante(Expresion valor, int linea, int columna)
+        {
             this.valor = valor;
         }
 
         public override Expresion getValor(Entorno ent)
         {
-            return new Primitivo(tipo, valor);
+            return this.valor;   
         }
 
         public override string getDot()

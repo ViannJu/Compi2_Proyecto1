@@ -21,9 +21,10 @@ namespace Compi2_Proyecto1.Analizador
             CommentTerminal commentUnilinea = new CommentTerminal("comentarioLinea", "//", "\n", "\r\n"); //si viene una nueva linea se termina de reconocer el comentario.
             CommentTerminal commentMultilinea1 = new CommentTerminal("comentarioBloque", "(*", "*)");
             CommentTerminal commentMultilinea2 = new CommentTerminal("comentarioBloque", "{", "*)");
-            RegexBasedTerminal num = new RegexBasedTerminal("num", "[0-9]+");
-            RegexBasedTerminal real = new RegexBasedTerminal("real", "[0-9]+[.[0-9]]?");
-            RegexBasedTerminal ID = new RegexBasedTerminal("id", "[A-ZÑa-zñ][_0-9A-ZÑa-zñ]*");
+            RegexBasedTerminal entero = new RegexBasedTerminal("num", "[0-9]+");
+            RegexBasedTerminal real = new RegexBasedTerminal("real", "[0-9]+.[0-9]+");
+            //RegexBasedTerminal ID = new RegexBasedTerminal("id", "[A-ZÑa-zñ][_0-9A-ZÑa-zñ]*");
+            IdentifierTerminal ID = new IdentifierTerminal("id");
             StringLiteral cadena = new StringLiteral("cadena", "'"); /* se indica que la cadena va a empezar con ' (comillas simples) y con esto acepta cualquier cosa que venga despues de las comillas dobles */
 
             #endregion
@@ -41,10 +42,13 @@ namespace Compi2_Proyecto1.Analizador
             var mayorigual = ToTerm(">=");
             var menorigual = ToTerm("<=");
             var igualdad = ToTerm("=");
+            var igualigual = ToTerm("==");
             var diferenteque = ToTerm("<>");
             var and = ToTerm("and");
             var or = ToTerm("or");
             var not = ToTerm("not");
+            var parIzquierdo = ToTerm("(");
+            var parDerecho = ToTerm(")");
 
             var tString = ToTerm("string");
             var tint = ToTerm("int");
@@ -61,8 +65,11 @@ namespace Compi2_Proyecto1.Analizador
             var ptcoma = ToTerm(";");
             var dospuntos = ToTerm(":");
             var coma = ToTerm(",");
+            var punto = ToTerm(".");
 
-            var tvar = ToTerm("var");
+            var tvar = ToTerm("var");            
+            var twriteln = ToTerm("writeln");
+            var twrite = ToTerm("write");
 
             #endregion
 
@@ -88,8 +95,11 @@ namespace Compi2_Proyecto1.Analizador
 
             NonTerminal DECLARACION = new NonTerminal("DECLARACION");
             NonTerminal ASIGNACION = new NonTerminal("ASIGNACION");
+            NonTerminal IMPRESION = new NonTerminal("IMPRESION");
+
             NonTerminal E = new NonTerminal("E");
             NonTerminal L_IDS = new NonTerminal("L_IDS");
+            NonTerminal L_IDS_Accesos = new NonTerminal("L_IDS_Accesos");
             NonTerminal TIPO = new NonTerminal("TIPO");
 
             #endregion
@@ -103,10 +113,14 @@ namespace Compi2_Proyecto1.Analizador
                 | INSTRUCCION + ptcoma               
                 ;
 
-            INSTRUCCION.Rule = E
-                | DECLARACION
-                //| ASIGNACION
+            INSTRUCCION.Rule =
+                 DECLARACION
+                | IMPRESION
                 ;
+
+            IMPRESION.Rule = 
+                twrite + parIzquierdo + E + parDerecho
+                |twriteln + parIzquierdo + E + parDerecho;
 
             DECLARACION.Rule = tvar + L_IDS + dospuntos + TIPO
                 | tvar + ID + dospuntos + TIPO + igualdad + E
@@ -128,11 +142,28 @@ namespace Compi2_Proyecto1.Analizador
                 |E + menos + E
                 |E + por + E
                 |E + dividido + E
-                |num
+                |E + modulo + E
+                |E + mayorque + E
+                |E + menorque + E
+                |E + mayorigual + E
+                |E + menorigual + E
+                |E + diferenteque + E
+                |E + igualigual + E
+                |E + or + E
+                |E + and + E
+                |not + E
+                |parIzquierdo + E + parDerecho
+                |menos + E  //para manejar numeros negativos
+                |entero
                 |real
                 |ttrue
                 |tfalse
+                |cadena
+                |L_IDS_Accesos
                 ;
+
+            L_IDS_Accesos.Rule = L_IDS_Accesos + punto + ID
+                |ID;
 
             L_IDS.Rule = L_IDS + coma + ID
                 |ID

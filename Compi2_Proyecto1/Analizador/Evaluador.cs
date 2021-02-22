@@ -6,6 +6,9 @@ using Irony.Parsing;
 using Compi2_Proyecto1.Expresiones;
 using Compi2_Proyecto1.Principales;
 using Compi2_Proyecto1.Instrucciones;
+using System.Windows.Forms;
+using Compi2_Proyecto1.Aritmeticas;
+using Compi2_Proyecto1.Objetos;
 
 namespace Compi2_Proyecto1.Analizador
 {
@@ -33,7 +36,7 @@ namespace Compi2_Proyecto1.Analizador
             }
             else
             {
-                MasterClass.Instance.addMessage("Entrada correcta", true);
+                MasterClass.Instance.addMessage("/****    Entrada correcta    ****/", true);
                 evaluarL_Instrucciones(raiz.ChildNodes[0]);
             }
 
@@ -48,7 +51,6 @@ namespace Compi2_Proyecto1.Analizador
                 evaluarInstruccion(nodo.ChildNodes[1]);
             } else if (nodo.ChildNodes.Count == 2) {
                 //L_Instrucciones = Instruccion + ptcoma
-                MasterClass.Instance.addMessage("Entramos aqui", true);
                 evaluarInstruccion(nodo.ChildNodes[0]);
 
             }
@@ -75,7 +77,6 @@ namespace Compi2_Proyecto1.Analizador
 
                         //MasterClass.Instance.addMessage("La lista de ids tiene: " + listaIDS.Count, true);
 
-
                         //Tengo que mandar el tipo 
                         Tipo tipe = evaluarTipo(nodo.ChildNodes[0].ChildNodes[3]);
 
@@ -95,12 +96,40 @@ namespace Compi2_Proyecto1.Analizador
                         Tipo tipe = evaluarTipo(nodo.ChildNodes[0].ChildNodes[3]);
 
                         //Tengo que mandar la Expresion
-                        //Expresion expression = evaluarExpresion(nodo.ChildNodes[0].ChildNodes[5]);
+                        Expresion expression = evaluarExpresion(nodo.ChildNodes[0].ChildNodes[5]);
 
                         //Mandamos la declaracion
-                        //Instruccion temp;
-                        //temp = new Declaracion(tipe, identificador, expression, 0, 0);
-                        //MasterClass.Instance.addInstruction(temp);
+                        Instruccion temp;
+                        temp = new Declaracion(tipe, identificador, expression, 0, 0);
+                        MasterClass.Instance.addInstruction(temp);
+                    }
+
+                    break;
+
+                case "IMPRESION":
+
+                    //no tiene salto de linea
+                    if (nodo.ChildNodes[0].ChildNodes[0].Term.Name == "write") {
+
+                        //primero mando a traer la expresion;
+                        Expresion expression = evaluarExpresion(nodo.ChildNodes[0].ChildNodes[2]);
+
+                        Instruccion temp;
+                        temp = new Impresion(expression, false);
+                        MasterClass.Instance.addInstruction(temp);
+
+                    }
+                    
+                    //tiene salto de linea
+                    else if (nodo.ChildNodes[0].ChildNodes[0].Term.Name == "writeln") {
+
+                        //primero mando a traer la expresion;
+                        Expresion expression = evaluarExpresion(nodo.ChildNodes[0].ChildNodes[2]);
+
+                        Instruccion temp;
+                        temp = new Impresion(expression, true);
+                        MasterClass.Instance.addInstruction(temp);
+
                     }
 
                     break;
@@ -116,13 +145,13 @@ namespace Compi2_Proyecto1.Analizador
                 //L_IDS = L_IDS + coma + ID
                 evaluarL_IDS(nodo.ChildNodes[0], lista);
                 //el siguiente nodo es un valor primitivo entonces guardamos en la lista
-                IDobjeto = evaluarPrimitivo(nodo.ChildNodes[2]);
+                IDobjeto = evaluarID(nodo.ChildNodes[2]);
                 lista.AddLast(IDobjeto.ToString());
             }
             else {
                 Object IDobjeto;
                 //L_IDS = ID //El siguiente nodo es un valor primitivo entonces guardamos en la lista
-                IDobjeto = evaluarPrimitivo(nodo.ChildNodes[0]);
+                IDobjeto = evaluarID(nodo.ChildNodes[0]);
                 lista.AddLast(IDobjeto.ToString());
             }
 
@@ -130,9 +159,11 @@ namespace Compi2_Proyecto1.Analizador
 
         }
 
-        private Object evaluarPrimitivo(ParseTreeNode nodo) {
+        private Object evaluarID(ParseTreeNode nodo) {
+
             new Id(nodo.Token.ValueString, 0, 0);
             return nodo.Token.ValueString;
+
         }
 
         private Tipo evaluarTipo(ParseTreeNode nodo) {
@@ -144,9 +175,9 @@ namespace Compi2_Proyecto1.Analizador
                     return new Tipo(Tipo.enumTipo.entero);
                 case "real":
                     return new Tipo(Tipo.enumTipo.real);
-                case "cadena":
+                case "string":
                     return new Tipo(Tipo.enumTipo.cadena);
-                case "booleano":
+                case "boolean":
                     return new Tipo(Tipo.enumTipo.booleano);
 
             }
@@ -154,13 +185,126 @@ namespace Compi2_Proyecto1.Analizador
             return new Tipo(Tipo.enumTipo.Null);
         }
 
-        /*
+        
         private Expresion evaluarExpresion(ParseTreeNode nodo) {
-
             //verificar de la gramatica cuantos hijos tiene
 
+            //Operaciones Aritmeticas, logicas, relacionales
+            if (nodo.ChildNodes.Count == 3)
+            {
+                switch (nodo.ChildNodes[1].Term.Name) {
+
+                    case "+":
+                        MessageBox.Show("Entre a suma");
+                        return new Suma(evaluarExpresion(nodo.ChildNodes[0]), evaluarExpresion(nodo.ChildNodes[2]), 0, 0);
+                    case "-":
+                        break;
+                    case "*":
+                        break;
+                    case "/":
+                        break;
+                    case "%":
+                        break;
+                    case ">":
+                        break;
+                    case "<":
+                        break;
+                    case ">=":
+                        break;
+                    case "<=":
+                        break;
+                    case "==":
+                        break;
+                    case "<>":
+                        break;
+                    case "or":
+                        break;
+                    case "and":
+                        break;
+                    default:
+
+                        //verificamos si es ( + E + )
+                        if (nodo.ChildNodes[0].Term.Name == "(" && nodo.ChildNodes[2].Term.Name == ")") {
+
+                            MessageBox.Show("Entre a un parentesis");
+
+                        }
+
+                        break;
+
+                }
+
+            }
+            //entonces es un primitivo
+            else {
+                return evaluarPrimitivo(nodo.ChildNodes[0]);
+
+            }
+
+            return null;
         }
-        */
+
+        private Expresion evaluarPrimitivo(ParseTreeNode nodo) {
+
+            //MessageBox.Show(nodo.Term.Name);    //entero, real, cadena, true, false
+            //MessageBox.Show(nodo.Token.ValueString);    //el valor como tal
+
+            switch (nodo.Term.Name) {
+
+                case "num":
+                    return new Primitivo(new Tipo(Tipo.enumTipo.entero), int.Parse(nodo.Token.ValueString));
+                case "real":
+                    return new Primitivo(new Tipo(Tipo.enumTipo.real), float.Parse(nodo.Token.ValueString));
+                case "cadena":
+                    return new Primitivo(new Tipo(Tipo.enumTipo.cadena), nodo.Token.ValueString);
+                case "true":
+                    return new Primitivo(new Tipo(Tipo.enumTipo.booleano), bool.Parse(nodo.Token.ValueString));
+                case "false":
+                    return new Primitivo(new Tipo(Tipo.enumTipo.booleano), bool.Parse(nodo.Token.ValueString));
+
+            }
+
+            //si llega aqui no tenia tipo y por lo tanto es una lista de accesos
+
+            //Mandamos a traer la lista de los ids
+            LinkedList<Id> ListaIDS = new LinkedList<Id>();
+
+            ListaIDS = evaluarL_IDS_Accesos(nodo, ListaIDS);
+
+            Lista_Accesos milistaAccesos = new Lista_Accesos(ListaIDS);
+
+            return milistaAccesos;
+
+
+        }
+
+        public LinkedList<Id> evaluarL_IDS_Accesos(ParseTreeNode nodo, LinkedList<Id> lista) {
+
+            if (nodo.ChildNodes.Count == 3)
+            {
+                Id IDobjeto;
+                //L_IDS = L_IDS + punto + ID
+                evaluarL_IDS_Accesos(nodo.ChildNodes[0], lista);
+                //el siguiente nodo es un valor primitivo entonces guardamos en la lista
+                IDobjeto = evaluarID_Acceso(nodo.ChildNodes[2]);
+                lista.AddLast(IDobjeto);
+            }
+            else
+            {
+                Id IDobjeto;
+                //L_IDS = ID //El siguiente nodo es un valor primitivo entonces guardamos en la lista
+                IDobjeto = evaluarID_Acceso(nodo.ChildNodes[0]);
+                lista.AddLast(IDobjeto);
+            }
+
+            return lista;
+
+        }
+
+        private Id evaluarID_Acceso(ParseTreeNode nodo)
+        {
+            return new Id(nodo.Token.ValueString, 0, 0);
+        }
 
 
 

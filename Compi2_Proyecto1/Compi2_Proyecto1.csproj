@@ -13,7 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Objetos\" />
+    <Folder Include="Logicas\" />
+    <Folder Include="Relacionales\" />
   </ItemGroup>
 
 </Project>

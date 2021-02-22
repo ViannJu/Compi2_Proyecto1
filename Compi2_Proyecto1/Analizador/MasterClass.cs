@@ -32,7 +32,7 @@ namespace Compi2_Proyecto1.Analizador
             if (salto)
             {
                 //añadimos salto
-                this.mensajes += "\n" + mensaje;
+                this.mensajes += mensaje + "\n";
             }
             else {
                 this.mensajes += mensaje;
