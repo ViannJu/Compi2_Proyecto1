@@ -13,7 +13,7 @@ namespace Compi2_Proyecto1.Aritmeticas
         Expresion hijo1;
         Expresion hijo2;
 
-        public Modulo(int linea, int columna, Expresion hijo1, Expresion hijo2)
+        public Modulo(Expresion hijo1, Expresion hijo2, int linea, int columna)
         {
             this.linea = linea;
             this.columna = columna;

@@ -12,9 +12,4 @@
     </Reference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Logicas\" />
-    <Folder Include="Relacionales\" />
-  </ItemGroup>
-
 </Project>

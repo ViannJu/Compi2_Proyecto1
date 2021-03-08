@@ -13,7 +13,7 @@ namespace Compi2_Proyecto1.Aritmeticas
         Expresion hijo1;    //rama izquierda de la operacion    
         Expresion hijo2;    //rama derecha de la operacion
 
-        public Division(int linea, int columna, Expresion hijo1, Expresion hijo2)
+        public Division(Expresion hijo1, Expresion hijo2, int linea, int columna)
         {
 
             this.operacion = "/";

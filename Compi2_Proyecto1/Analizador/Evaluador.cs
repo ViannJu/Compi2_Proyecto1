@@ -9,6 +9,8 @@ using Compi2_Proyecto1.Instrucciones;
 using System.Windows.Forms;
 using Compi2_Proyecto1.Aritmeticas;
 using Compi2_Proyecto1.Objetos;
+using Compi2_Proyecto1.Relacionales;
+using Compi2_Proyecto1.Logicas;
 
 namespace Compi2_Proyecto1.Analizador
 {
@@ -198,29 +200,29 @@ namespace Compi2_Proyecto1.Analizador
                         MessageBox.Show("Entre a suma");
                         return new Suma(evaluarExpresion(nodo.ChildNodes[0]), evaluarExpresion(nodo.ChildNodes[2]), 0, 0);
                     case "-":
-                        break;
+                        return new Resta(evaluarExpresion(nodo.ChildNodes[0]), evaluarExpresion(nodo.ChildNodes[2]), 0, 0);
                     case "*":
-                        break;
+                        return new Multiplicacion(evaluarExpresion(nodo.ChildNodes[0]), evaluarExpresion(nodo.ChildNodes[2]), 0, 0);
                     case "/":
-                        break;
+                        return new Division(evaluarExpresion(nodo.ChildNodes[0]), evaluarExpresion(nodo.ChildNodes[2]), 0, 0);
                     case "%":
-                        break;
+                        return new Modulo(evaluarExpresion(nodo.ChildNodes[0]), evaluarExpresion(nodo.ChildNodes[2]), 0, 0);
                     case ">":
-                        break;
+                        return new Relacional(evaluarExpresion(nodo.ChildNodes[0]), evaluarExpresion(nodo.ChildNodes[2]), ">", 0, 0);
                     case "<":
-                        break;
+                        return new Relacional(evaluarExpresion(nodo.ChildNodes[0]), evaluarExpresion(nodo.ChildNodes[2]), "<", 0, 0);
                     case ">=":
-                        break;
+                        return new Relacional(evaluarExpresion(nodo.ChildNodes[0]), evaluarExpresion(nodo.ChildNodes[2]), ">=", 0, 0);
                     case "<=":
-                        break;
+                        return new Relacional(evaluarExpresion(nodo.ChildNodes[0]), evaluarExpresion(nodo.ChildNodes[2]), "<=", 0, 0);
                     case "==":
-                        break;
+                        return new Relacional(evaluarExpresion(nodo.ChildNodes[0]), evaluarExpresion(nodo.ChildNodes[2]), "==", 0, 0);
                     case "<>":
-                        break;
+                        return new Relacional(evaluarExpresion(nodo.ChildNodes[0]), evaluarExpresion(nodo.ChildNodes[2]), "!=", 0, 0);
                     case "or":
-                        break;
+                        return new Logica(evaluarExpresion(nodo.ChildNodes[0]), evaluarExpresion(nodo.ChildNodes[2]), "or", 0, 0);
                     case "and":
-                        break;
+                        return new Logica(evaluarExpresion(nodo.ChildNodes[0]), evaluarExpresion(nodo.ChildNodes[2]), "and", 0, 0);
                     default:
 
                         //verificamos si es ( + E + )
@@ -231,6 +233,17 @@ namespace Compi2_Proyecto1.Analizador
                         }
 
                         break;
+
+                }
+
+            } else if (nodo.ChildNodes.Count == 2) {
+
+                switch (nodo.ChildNodes[0].Term.Name) {
+
+                    case "-":
+                        return new Negativo(evaluarExpresion(nodo.ChildNodes[1]), 0, 0);
+                    case "not":
+                        return new Logica(evaluarExpresion(nodo.ChildNodes[1]), "not", 0, 0);
 
                 }
 
