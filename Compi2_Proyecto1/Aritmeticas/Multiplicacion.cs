@@ -1,24 +1,26 @@
-﻿using Compi2_Proyecto1.Principales;
-using Compi2_Proyecto1.Analizador;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Compi2_Proyecto1.Analizador;
+using Compi2_Proyecto1.Principales;
 
 namespace Compi2_Proyecto1.Aritmeticas
 {
-    public class Suma : Expresion
+    public class Multiplicacion : Expresion
     {
+
         Expresion hijoIzq;
         Expresion hijoDer;
 
-        public Suma(Expresion hijoIzq, Expresion hijoDer, int linea, int columna) {
+        public Multiplicacion(Expresion hijoIzq, Expresion hijoDer, int linea, int columna)
+        {
             this.hijoIzq = hijoIzq;
             this.hijoDer = hijoDer;
             this.linea = linea;
             this.columna = columna;
         }
 
-        //resolvemos la operacion y devolvemos que valor nos dio
+        
         public override Expresion getValor(Entorno ent)
         {
             //declaramos un valor que por defecto sera error
@@ -27,20 +29,22 @@ namespace Compi2_Proyecto1.Aritmeticas
             Expresion resultadoDer = this.hijoDer.getValor(ent);
 
             //Hijo izquierdo y dentro de cada uno se puede validar el hijo derecho (para saber con cual se esta sumando)
-            switch (resultadoIzq.tipo.tipo) {
+            switch (resultadoIzq.tipo.tipo)
+            {
                 case Tipo.enumTipo.entero:
 
-                    switch (resultadoDer.tipo.tipo) {
+                    switch (resultadoDer.tipo.tipo)
+                    {
                         case Tipo.enumTipo.entero:
-                            resultadoGeneral = new Primitivo(new Tipo(Tipo.enumTipo.entero), int.Parse(resultadoIzq.valor.ToString()) + int.Parse(resultadoDer.valor.ToString()));
+                            resultadoGeneral = new Primitivo(new Tipo(Tipo.enumTipo.entero), int.Parse(resultadoIzq.valor.ToString()) * int.Parse(resultadoDer.valor.ToString()));
                             return resultadoGeneral;
 
                         case Tipo.enumTipo.real:
-                            resultadoGeneral = new Primitivo(new Tipo(Tipo.enumTipo.real), float.Parse(resultadoIzq.valor.ToString()) + float.Parse(resultadoDer.valor.ToString()));
+                            resultadoGeneral = new Primitivo(new Tipo(Tipo.enumTipo.real), float.Parse(resultadoIzq.valor.ToString()) * float.Parse(resultadoDer.valor.ToString()));
                             return resultadoGeneral;
 
                         default:
-                            MasterClass.Instance.addError(new C_Error("Semantico", "No se puede sumar: " + resultadoDer.tipo.tipo + " con: " + resultadoIzq.tipo.tipo, linea, columna));
+                            MasterClass.Instance.addError(new C_Error("Semantico", "No se puede multiplicar: " + resultadoDer.tipo.tipo + " con: " + resultadoIzq.tipo.tipo, linea, columna));
                             break;
                     }
 
@@ -51,34 +55,32 @@ namespace Compi2_Proyecto1.Aritmeticas
                     switch (resultadoDer.tipo.tipo)
                     {
                         case Tipo.enumTipo.entero:
-                            resultadoGeneral = new Primitivo(new Tipo(Tipo.enumTipo.real), float.Parse(resultadoIzq.valor.ToString()) + float.Parse(resultadoDer.valor.ToString()));
+                            resultadoGeneral = new Primitivo(new Tipo(Tipo.enumTipo.real), float.Parse(resultadoIzq.valor.ToString()) * float.Parse(resultadoDer.valor.ToString()));
                             return resultadoGeneral;
 
                         case Tipo.enumTipo.real:
-                            resultadoGeneral = new Primitivo(new Tipo(Tipo.enumTipo.real), float.Parse(resultadoIzq.valor.ToString()) + float.Parse(resultadoDer.valor.ToString()));
+                            resultadoGeneral = new Primitivo(new Tipo(Tipo.enumTipo.real), float.Parse(resultadoIzq.valor.ToString()) * float.Parse(resultadoDer.valor.ToString()));
                             return resultadoGeneral;
 
                         default:
-                            MasterClass.Instance.addError(new C_Error("Semantico", "No se puede sumar: " + resultadoDer.tipo.tipo + " con: " + resultadoIzq.tipo.tipo, linea, columna));
+                            MasterClass.Instance.addError(new C_Error("Semantico", "No se puede multiplicar: " + resultadoDer.tipo.tipo + " con: " + resultadoIzq.tipo.tipo, linea, columna));
                             break;
                     }
 
                     break;
 
                 default:
-                    MasterClass.Instance.addError(new C_Error("Semantico", "No se puede sumar: " + resultadoDer.tipo.tipo + " con: " + resultadoIzq.tipo.tipo, linea, columna));
+                    MasterClass.Instance.addError(new C_Error("Semantico", "No se puede multiplicar: " + resultadoDer.tipo.tipo + " con: " + resultadoIzq.tipo.tipo, linea, columna));
                     break;
             }
 
             return resultadoGeneral;
         }
 
-
         public override string getDot()
         {
             throw new NotImplementedException();
         }
 
-        
     }
 }

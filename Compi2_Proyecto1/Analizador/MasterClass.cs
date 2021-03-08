@@ -10,6 +10,7 @@ namespace Compi2_Proyecto1.Analizador
         private string output = "";
         private string mensajes = "";
         private LinkedList<Instruccion> instrucciones = new LinkedList<Instruccion>();
+        private LinkedList<C_Error> listaErrores = new LinkedList<C_Error>();
         private static readonly MasterClass instance = new MasterClass();
         public Entorno general;
 
@@ -64,6 +65,16 @@ namespace Compi2_Proyecto1.Analizador
         public void addInstruction(Instruccion instruccion)
         {
             this.instrucciones.AddLast(instruccion);
+        }
+
+        public void addError(C_Error mistake) {
+            this.listaErrores.AddLast(mistake);
+        }
+
+        public void showAllErrors() {
+            foreach (C_Error mistake in this.listaErrores) {
+                Console.WriteLine(mistake.getDescripcionError());
+            }
         }
 
         public int getCantidad()
