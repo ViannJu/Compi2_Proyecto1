@@ -32,6 +32,8 @@ namespace Compi2_Proyecto1.Analizador
             //Definicion de terminales
             #region Terminales
 
+            var program = ToTerm("program");
+
             var mas = ToTerm("+");
             var menos = ToTerm("-");
             var dividido = ToTerm("/");
@@ -71,6 +73,11 @@ namespace Compi2_Proyecto1.Analizador
             var twriteln = ToTerm("writeln");
             var twrite = ToTerm("write");
 
+            var tif = ToTerm("if");
+            var telse = ToTerm("else");
+            var tbegin = ToTerm("begin");
+            var tend = ToTerm("end");
+
             #endregion
 
             #region PRIORIDAD
@@ -102,20 +109,37 @@ namespace Compi2_Proyecto1.Analizador
             NonTerminal L_IDS_Accesos = new NonTerminal("L_IDS_Accesos");
             NonTerminal TIPO = new NonTerminal("TIPO");
 
+            NonTerminal SENT_IF = new NonTerminal("SENT_IF");
+            NonTerminal L_IF = new NonTerminal("L_IF");
+            NonTerminal BLOQUE = new NonTerminal("BLOQUE");
+
             #endregion
 
 
             #region Gramatica
 
-            INICIO.Rule = L_INSTRUCCIONES;
+            INICIO.Rule = program + ID + ptcoma + L_INSTRUCCIONES;
 
-            L_INSTRUCCIONES.Rule = L_INSTRUCCIONES + INSTRUCCION + ptcoma
-                | INSTRUCCION + ptcoma               
+            L_INSTRUCCIONES.Rule = L_INSTRUCCIONES + INSTRUCCION
+                | INSTRUCCION              
                 ;
 
             INSTRUCCION.Rule =
-                 DECLARACION
-                | IMPRESION
+                 DECLARACION + ptcoma
+                |IMPRESION + ptcoma
+                |SENT_IF + ptcoma
+                |BLOQUE +punto      //El unico bloque independiente es el *Main*
+                ;
+
+            SENT_IF.Rule = L_IF + telse + BLOQUE
+                |L_IF
+                ;
+
+            L_IF.Rule = L_IF + telse + tif + parIzquierdo + E + parDerecho + BLOQUE
+                |tif + parIzquierdo + E + parDerecho + BLOQUE;
+
+            BLOQUE.Rule = tbegin + tend
+                |tbegin + L_INSTRUCCIONES + tend
                 ;
 
             IMPRESION.Rule = 

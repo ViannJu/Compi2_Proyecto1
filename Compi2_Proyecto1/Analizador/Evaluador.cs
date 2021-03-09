@@ -1,16 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using Irony.Ast;
 using Irony.Parsing;
+using System.Windows.Forms;
+using System.Collections.Generic;
 using Compi2_Proyecto1.Expresiones;
 using Compi2_Proyecto1.Principales;
 using Compi2_Proyecto1.Instrucciones;
-using System.Windows.Forms;
 using Compi2_Proyecto1.Aritmeticas;
 using Compi2_Proyecto1.Objetos;
 using Compi2_Proyecto1.Relacionales;
 using Compi2_Proyecto1.Logicas;
+using Compi2_Proyecto1.Control;
 
 namespace Compi2_Proyecto1.Analizador
 {
@@ -39,35 +40,89 @@ namespace Compi2_Proyecto1.Analizador
             else
             {
                 MasterClass.Instance.addMessage("/****    Entrada correcta    ****/", true);
-                evaluarL_Instrucciones(raiz.ChildNodes[0]);
+                evaluarL_Instrucciones(raiz.ChildNodes[3], false, null);
             }
 
         }
 
         /********** AQUI EMPEZAMOS A CONSTRUIR EL ARBOL DE ANALISIS SINTACTICO **********/
 
-        private void evaluarL_Instrucciones(ParseTreeNode nodo) {
-            if (nodo.ChildNodes.Count == 3) {
+        private void evaluarL_Instrucciones(ParseTreeNode nodo, bool bloque, LinkedList<Instruccion> guardadosBloque) {
+            if (nodo.ChildNodes.Count == 2) {
                 //L_Instrucciones = L_Instrucciones + Instruccion + ptcoma
-                evaluarL_Instrucciones(nodo.ChildNodes[0]);
-                evaluarInstruccion(nodo.ChildNodes[1]);
-            } else if (nodo.ChildNodes.Count == 2) {
+                evaluarL_Instrucciones(nodo.ChildNodes[0], bloque, guardadosBloque);
+                evaluarInstruccion(nodo.ChildNodes[1], bloque, guardadosBloque);
+            } else if (nodo.ChildNodes.Count == 1) {
                 //L_Instrucciones = Instruccion + ptcoma
-                evaluarInstruccion(nodo.ChildNodes[0]);
+                evaluarInstruccion(nodo.ChildNodes[0], bloque, guardadosBloque);
 
             }
         }
 
-        private void evaluarInstruccion(ParseTreeNode nodo) {
+        private void evaluarInstruccion(ParseTreeNode nodo, bool bloque, LinkedList<Instruccion> guardadosInstruccion) {
 
             //Bifurcacion de metodos dependiendo de la instruccion
 
             //Como se llama la instruccion que viene
             switch (nodo.ChildNodes[0].Term.Name) {
 
+                case "SENT_IF":
+
+                    break;
+
+
+
+                case "BLOQUE":
+                    //entonces el bloque tiene instrucciones
+                    if (nodo.ChildNodes[0].ChildNodes.Count == 3)
+                    {
+
+                        //mandamos a traer la lista de instrucciones
+                        LinkedList<Instruccion> listaInsBloque = new LinkedList<Instruccion>();
+                        evaluarL_Instrucciones(nodo.ChildNodes[0].ChildNodes[1], true, listaInsBloque);
+
+                        Instruccion temp;
+                        temp = new Bloque(listaInsBloque);
+
+                        //Si es un bloque se guarda en la lista de instrucciones de bloque
+                        if (bloque)
+                        {
+                            guardadosInstruccion.AddLast(temp);
+                        }
+                        //Si no es un bloque es la lista general de instrucciones de MasterClass
+                        else
+                        {
+                            //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                            MasterClass.Instance.addInstruction(temp);
+                            //MessageBox.Show("guarde el bloque en la masterclass");
+                        }
+
+                    }
+                    //entonces el bloque no tiene instrucciones
+                    else if (nodo.ChildNodes[0].ChildNodes.Count == 2)
+                    {
+
+                        Instruccion temp;
+                        temp = new Bloque();
+
+                        //Si es un bloque se guarda en la lista de instrucciones de bloque
+                        if (bloque)
+                        {
+                            guardadosInstruccion.AddLast(temp);
+                        }
+                        //Si no es un bloque es la lista general de instrucciones de MasterClass
+                        else
+                        {
+                            //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                            MasterClass.Instance.addInstruction(temp);
+                        }
+
+                    }
+                    break;
+
+
                 //Declaracion
                 case "DECLARACION":
-
                     if (nodo.ChildNodes[0].ChildNodes.Count == 4)
                     {
                         //tvar + L_IDS + dospuntos + TIPO
@@ -82,10 +137,23 @@ namespace Compi2_Proyecto1.Analizador
                         //Tengo que mandar el tipo 
                         Tipo tipe = evaluarTipo(nodo.ChildNodes[0].ChildNodes[3]);
 
-                        //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
                         Instruccion temp;
                         temp = new Declaracion(tipe, listaIDS, 0, 0);
-                        MasterClass.Instance.addInstruction(temp);
+
+
+                        //Si es un bloque se guarda en la lista de instrucciones de bloque
+                        if (bloque)
+                        {
+                            guardadosInstruccion.AddLast(temp);
+                        }
+                        //Si no es un bloque es la lista general de instrucciones de MasterClass
+                        else {
+                            //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                            MasterClass.Instance.addInstruction(temp);
+                        }
+                        
+                        
+                        
                     }
                     else {
 
@@ -103,7 +171,20 @@ namespace Compi2_Proyecto1.Analizador
                         //Mandamos la declaracion
                         Instruccion temp;
                         temp = new Declaracion(tipe, identificador, expression, 0, 0);
-                        MasterClass.Instance.addInstruction(temp);
+
+                        //Si es un bloque se guarda en la lista de instrucciones de bloque
+                        if (bloque)
+                        {
+                            guardadosInstruccion.AddLast(temp);
+                        }
+                        //Si no es un bloque es la lista general de instrucciones de MasterClass
+                        else
+                        {
+                            //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                            MasterClass.Instance.addInstruction(temp);
+                        }
+
+
                     }
 
                     break;
@@ -118,7 +199,20 @@ namespace Compi2_Proyecto1.Analizador
 
                         Instruccion temp;
                         temp = new Impresion(expression, false);
-                        MasterClass.Instance.addInstruction(temp);
+
+                        //Si es un bloque se guarda en la lista de instrucciones de bloque
+                        if (bloque)
+                        {
+                            guardadosInstruccion.AddLast(temp);
+                        }
+                        //Si no es un bloque es la lista general de instrucciones de MasterClass
+                        else
+                        {
+                            //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                            MasterClass.Instance.addInstruction(temp);
+                        }
+
+
 
                     }
                     
@@ -130,11 +224,28 @@ namespace Compi2_Proyecto1.Analizador
 
                         Instruccion temp;
                         temp = new Impresion(expression, true);
-                        MasterClass.Instance.addInstruction(temp);
+
+
+
+                        //Si es un bloque se guarda en la lista de instrucciones de bloque
+                        if (bloque)
+                        {
+                            guardadosInstruccion.AddLast(temp);
+                        }
+                        //Si no es un bloque es la lista general de instrucciones de MasterClass
+                        else
+                        {
+                            //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                            MasterClass.Instance.addInstruction(temp);
+                        }
 
                     }
 
                     break;
+
+
+                
+
             }
 
         }

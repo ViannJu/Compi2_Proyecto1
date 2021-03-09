@@ -35,7 +35,7 @@ namespace Compi2_Proyecto1.Instrucciones
 
         public override Object ejecutar(Entorno ent)
         {
-            MessageBox.Show("Entre al ejecutar de la clase Declaracion");
+            //MessageBox.Show("Entre al ejecutar de la clase Declaracion");
             //si se le asigno un valor a la variable    ASIGNACION/DECLARACION
             if (this.valor != null)
             {
