@@ -35,11 +35,15 @@ namespace Compi2_Proyecto1
             this.richTextBox3.Text = "";
 
             //limpiamos el contenido de la singleton
+            MasterClass.Instance.clearMistakes();
             MasterClass.Instance.clear();
+
             Evaluador evaluator = new Evaluador();
             evaluator.analizar(this.richTextBox1.Text);
             //MessageBox.Show(MasterClass.Instance.getMessages()+"\nCantidad de instrucciones: "+MasterClass.Instance.getCantidad());
+
             MasterClass.Instance.ejecutar();
+            MasterClass.Instance.ifMistakes();
             this.richTextBox3.Text = MasterClass.Instance.getMessages();
         }
     }

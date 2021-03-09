@@ -72,7 +72,7 @@ namespace Compi2_Proyecto1.Analizador
 
                         //Mando a traer la lista de condiciones if
                         LinkedList<Condicion_If> listacondiciones = new LinkedList<Condicion_If>();
-                        listacondiciones = evaluarListaCondiciones_IF(nodo.ChildNodes[0], listacondiciones);
+                        evaluarListaCondiciones_IF(nodo.ChildNodes[0], listacondiciones);
 
                         //Mando a traer la lista de instruccion del bloque
                         Bloque block = evaluarBloque(nodo.ChildNodes[0].ChildNodes[2]);
@@ -99,7 +99,7 @@ namespace Compi2_Proyecto1.Analizador
 
                         //Mando a traer la lista de condiciones if
                         LinkedList<Condicion_If> listacondiciones = new LinkedList<Condicion_If>();
-                        listacondiciones = evaluarListaCondiciones_IF(nodo.ChildNodes[0], listacondiciones);
+                        evaluarListaCondiciones_IF(nodo.ChildNodes[0], listacondiciones);
 
                         Instruccion temp;
                         temp = new Clase_IF(listacondiciones);
@@ -306,7 +306,7 @@ namespace Compi2_Proyecto1.Analizador
             //L_IF + telse + tif + parIzquierdo + E + parDerecho + then + BLOQUE
             if (nodo.ChildNodes[0].ChildNodes.Count == 8) {
 
-                listaCondicion = evaluarListaCondiciones_IF(nodo.ChildNodes[0].ChildNodes[0], listaCondicion);
+                listaCondicion = evaluarListaCondiciones_IF(nodo.ChildNodes[0], listaCondicion);
                 Expresion exp = evaluarExpresion(nodo.ChildNodes[0].ChildNodes[4]);
 
                 //Mando a traer las instrucciones del bloque

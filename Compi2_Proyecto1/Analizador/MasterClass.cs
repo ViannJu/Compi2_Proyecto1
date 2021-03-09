@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Forms;
 
 namespace Compi2_Proyecto1.Analizador
 {
@@ -75,6 +76,16 @@ namespace Compi2_Proyecto1.Analizador
             foreach (C_Error mistake in this.listaErrores) {
                 Console.WriteLine(mistake.getDescripcionError());
             }
+        }
+
+        public void ifMistakes() {
+            if (this.listaErrores.Count != 0) {
+                MessageBox.Show("Se detectaron errores en la entrada");
+            }
+        }
+
+        public void clearMistakes() {
+            this.listaErrores.Clear();
         }
 
         public int getCantidad()
