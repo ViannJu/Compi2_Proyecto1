@@ -75,6 +75,7 @@ namespace Compi2_Proyecto1.Analizador
 
             var tif = ToTerm("if");
             var telse = ToTerm("else");
+            var tthen = ToTerm("then");
             var tbegin = ToTerm("begin");
             var tend = ToTerm("end");
 
@@ -85,7 +86,7 @@ namespace Compi2_Proyecto1.Analizador
             RegisterOperators(1, Associativity.Left, and, or, not);
             RegisterOperators(2, Associativity.Left, mayorque, menorque, mayorigual, menorigual, igualdad, diferenteque);
             RegisterOperators(3, Associativity.Left, mas, menos);
-            RegisterOperators(4, Associativity.Left, por, dividido);
+            RegisterOperators(4, Associativity.Left, por, dividido, modulo);
             //Aqui falta el umenos
 
             NonGrammarTerminals.Add(commentUnilinea);
@@ -135,8 +136,12 @@ namespace Compi2_Proyecto1.Analizador
                 |L_IF
                 ;
 
-            L_IF.Rule = L_IF + telse + tif + parIzquierdo + E + parDerecho + BLOQUE
-                |tif + parIzquierdo + E + parDerecho + BLOQUE;
+            L_IF.Rule = L_IF + telse + tif + parIzquierdo + E + parDerecho + tthen + BLOQUE
+                |tif + parIzquierdo + E + parDerecho + tthen + BLOQUE
+                ;
+
+            //L_IF.Rule = MakePlusRule(L_IF, telse + tif + parIzquierdo + E + parDerecho + tthen + BLOQUE)
+             //   | tif + parIzquierdo + E + parDerecho + tthen + BLOQUE;
 
             BLOQUE.Rule = tbegin + tend
                 |tbegin + L_INSTRUCCIONES + tend

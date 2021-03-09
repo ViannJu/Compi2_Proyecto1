@@ -67,7 +67,58 @@ namespace Compi2_Proyecto1.Analizador
             switch (nodo.ChildNodes[0].Term.Name) {
 
                 case "SENT_IF":
+                    //L_IF + telse + BLOQUE  -> tiene else
+                    if (nodo.ChildNodes[0].ChildNodes.Count == 3) {
 
+                        //Mando a traer la lista de condiciones if
+                        LinkedList<Condicion_If> listacondiciones = new LinkedList<Condicion_If>();
+                        listacondiciones = evaluarListaCondiciones_IF(nodo.ChildNodes[0], listacondiciones);
+
+                        //Mando a traer la lista de instruccion del bloque
+                        Bloque block = evaluarBloque(nodo.ChildNodes[0].ChildNodes[2]);
+
+                        Instruccion temp;
+                        temp = new Clase_IF(listacondiciones, block);
+
+                        //Si es un bloque se guarda en la lista de instrucciones de bloque
+                        if (bloque)
+                        {
+                            guardadosInstruccion.AddLast(temp);
+                        }
+                        //Si no es un bloque es la lista general de instrucciones de MasterClass
+                        else
+                        {
+                            //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                            MasterClass.Instance.addInstruction(temp);
+                            //MessageBox.Show("guarde el bloque en la masterclass");
+                        }
+
+                    }
+                    //L_IF
+                    else if (nodo.ChildNodes[0].ChildNodes.Count == 1) {
+
+                        //Mando a traer la lista de condiciones if
+                        LinkedList<Condicion_If> listacondiciones = new LinkedList<Condicion_If>();
+                        listacondiciones = evaluarListaCondiciones_IF(nodo.ChildNodes[0], listacondiciones);
+
+                        Instruccion temp;
+                        temp = new Clase_IF(listacondiciones);
+
+                        //Si es un bloque se guarda en la lista de instrucciones de bloque
+                        if (bloque)
+                        {
+                            guardadosInstruccion.AddLast(temp);
+                        }
+                        //Si no es un bloque es la lista general de instrucciones de MasterClass
+                        else
+                        {
+                            //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                            MasterClass.Instance.addInstruction(temp);
+                            //MessageBox.Show("guarde el bloque en la masterclass");
+                        }
+
+                    }
+                         
                     break;
 
 
@@ -247,6 +298,63 @@ namespace Compi2_Proyecto1.Analizador
                 
 
             }
+
+        }
+
+        private LinkedList<Condicion_If> evaluarListaCondiciones_IF(ParseTreeNode nodo, LinkedList<Condicion_If> listaCondicion) {
+
+            //L_IF + telse + tif + parIzquierdo + E + parDerecho + then + BLOQUE
+            if (nodo.ChildNodes[0].ChildNodes.Count == 8) {
+
+                listaCondicion = evaluarListaCondiciones_IF(nodo.ChildNodes[0].ChildNodes[0], listaCondicion);
+                Expresion exp = evaluarExpresion(nodo.ChildNodes[0].ChildNodes[4]);
+
+                //Mando a traer las instrucciones del bloque
+                Bloque block = evaluarBloque(nodo.ChildNodes[0].ChildNodes[7]);
+
+                Condicion_If condition = new Condicion_If(exp, block);
+                listaCondicion.AddLast(condition);
+
+                return listaCondicion;
+
+            }
+            //tif + parIzquierdo + E + parDerecho + tthen + BLOQUE
+            else if (nodo.ChildNodes[0].ChildNodes.Count == 6) {
+
+                //mando a traer la expresion
+                Expresion exp = evaluarExpresion(nodo.ChildNodes[0].ChildNodes[2]);
+
+                //Mando a traer las instrucciones del bloque
+                Bloque block = evaluarBloque(nodo.ChildNodes[0].ChildNodes[5]);
+
+                //devuelvo una lista de objetos condicion
+                Condicion_If condition = new Condicion_If(exp, block);
+                listaCondicion.AddLast(condition);
+
+                return listaCondicion;
+
+            }
+
+            return listaCondicion;
+            
+
+        }
+
+        private Bloque evaluarBloque(ParseTreeNode nodo) {
+
+            Bloque lego;
+            LinkedList<Instruccion> mylistaInstrucciones = new LinkedList<Instruccion>();
+            //si tiene instrucciones
+            if (nodo.ChildNodes.Count == 3) {
+
+                evaluarL_Instrucciones(nodo.ChildNodes[1], true, mylistaInstrucciones);
+                lego = new Bloque(mylistaInstrucciones);
+                return lego;
+            }
+
+             lego = new Bloque();
+             return lego;
+            
 
         }
 
