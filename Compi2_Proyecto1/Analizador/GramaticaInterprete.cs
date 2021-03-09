@@ -78,6 +78,8 @@ namespace Compi2_Proyecto1.Analizador
             var tthen = ToTerm("then");
             var tbegin = ToTerm("begin");
             var tend = ToTerm("end");
+            var twhile = ToTerm("while");
+            var tdo = ToTerm("do");
 
             #endregion
 
@@ -113,6 +115,7 @@ namespace Compi2_Proyecto1.Analizador
             NonTerminal SENT_IF = new NonTerminal("SENT_IF");
             NonTerminal L_IF = new NonTerminal("L_IF");
             NonTerminal BLOQUE = new NonTerminal("BLOQUE");
+            NonTerminal SENT_WHILE = new NonTerminal("SENT_WHILE");
 
             #endregion
 
@@ -127,10 +130,14 @@ namespace Compi2_Proyecto1.Analizador
 
             INSTRUCCION.Rule =
                  DECLARACION + ptcoma
+                |ASIGNACION + ptcoma
                 |IMPRESION + ptcoma
                 |SENT_IF + ptcoma
+                |SENT_WHILE + ptcoma
                 |BLOQUE +punto      //El unico bloque independiente es el *Main*
                 ;
+
+            SENT_WHILE.Rule = twhile + E + tdo + BLOQUE;
 
             SENT_IF.Rule = L_IF + telse + BLOQUE
                 |L_IF
@@ -150,6 +157,8 @@ namespace Compi2_Proyecto1.Analizador
             IMPRESION.Rule = 
                 twrite + parIzquierdo + E + parDerecho
                 |twriteln + parIzquierdo + E + parDerecho;
+
+            ASIGNACION.Rule = ID + dospuntos + igualdad + E;
 
             DECLARACION.Rule = tvar + L_IDS + dospuntos + TIPO
                 | tvar + ID + dospuntos + TIPO + igualdad + E

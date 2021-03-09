@@ -66,6 +66,11 @@ namespace Compi2_Proyecto1.Analizador
             //Como se llama la instruccion que viene
             switch (nodo.ChildNodes[0].Term.Name) {
 
+                case "SENT_WHILE":
+                    
+                    break;
+
+
                 case "SENT_IF":
                     //L_IF + telse + BLOQUE  -> tiene else
                     if (nodo.ChildNodes[0].ChildNodes.Count == 3) {
@@ -171,6 +176,35 @@ namespace Compi2_Proyecto1.Analizador
                     }
                     break;
 
+                case "ASIGNACION":
+                    //ID + dospuntos + igualdad + E;
+
+                    //por el momento solo le envio el id de la variable y la expresion
+                    String nombreVar = nodo.ChildNodes[0].ChildNodes[0].Token.ValueString;
+                    MessageBox.Show("El nombre de la variable es: "+nombreVar);
+
+                    //Mando a traer la expresion
+                    Expresion exp = evaluarExpresion(nodo.ChildNodes[0].ChildNodes[3]);
+
+                    //Creo el objeto instruccion
+                    Instruccion temporal;
+                    temporal = new Asignacion(nombreVar, exp, 0, 0);
+
+                    //Si es un bloque se guarda en la lista de instrucciones de bloque
+                    if (bloque)
+                    {
+                        guardadosInstruccion.AddLast(temporal);
+                    }
+                    //Si no es un bloque es la lista general de instrucciones de MasterClass
+                    else
+                    {
+                        //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                        MasterClass.Instance.addInstruction(temporal);
+                        //MessageBox.Show("guarde el bloque en la masterclass");
+                    }
+
+
+                    break;
 
                 //Declaracion
                 case "DECLARACION":
