@@ -12,10 +12,12 @@ namespace Compi2_Proyecto1.Control
         Expresion condicion;
         Bloque sentencias;
 
-        public While(Expresion condicion, Bloque sentencias)
+        public While(Expresion condicion, Bloque sentencias, int linea, int columna)
         {
             this.condicion = condicion;
             this.sentencias = sentencias;
+            this.linea = linea;
+            this.columna = columna;
 
         }
 

@@ -67,7 +67,29 @@ namespace Compi2_Proyecto1.Analizador
             switch (nodo.ChildNodes[0].Term.Name) {
 
                 case "SENT_WHILE":
-                    
+                    //twhile + E + tdo + BLOQUE;
+
+                    //Mando a traer la expresion de condicion
+                    Expresion exp1 = evaluarExpresion(nodo.ChildNodes[0].ChildNodes[1]);
+
+                    //Mando a traer el bloque de sentencias
+                    Bloque lego = evaluarBloque(nodo.ChildNodes[0].ChildNodes[3]);
+
+                    Instruccion temp1;
+                    temp1 = new While(exp1, lego, 0, 0);
+
+                    //Si es un bloque se guarda en la lista de instrucciones de bloque
+                    if (bloque)
+                    {
+                        guardadosInstruccion.AddLast(temp1);
+                    }
+                    //Si no es un bloque es la lista general de instrucciones de MasterClass
+                    else
+                    {
+                        //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                        MasterClass.Instance.addInstruction(temp1);
+                        //MessageBox.Show("guarde el bloque en la masterclass");
+                    }
                     break;
 
 
