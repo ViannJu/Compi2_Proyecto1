@@ -10,6 +10,8 @@ namespace Compi2_Proyecto1.Analizador
     {
         private string output = "";
         private string mensajes = "";
+        public static LinkedList<TipoCiclo> Display = new LinkedList<TipoCiclo>();
+        //public static LinkedList<TipoMF> PilaMF = new LinkedList<>();
         private LinkedList<Instruccion> instrucciones = new LinkedList<Instruccion>();
         private LinkedList<C_Error> listaErrores = new LinkedList<C_Error>();
         private static readonly MasterClass instance = new MasterClass();
@@ -29,6 +31,14 @@ namespace Compi2_Proyecto1.Analizador
          * @param mensaje: el mensaje que se quiere concatenar para la salida
          * @param salto: indica si existe salto de linea 
          */
+
+        public enum TipoCiclo
+        {
+            //los tipos de primitivos
+            Ciclo, Switch
+        }
+
+
         public void addMessage(string mensaje, Boolean salto)
         {
             if (salto)

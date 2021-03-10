@@ -10,7 +10,7 @@ namespace Compi2_Proyecto1.Control
     public class Bloque : Instruccion
     {
 
-        LinkedList<Instruccion> listaInstrucciones = new LinkedList<Instruccion>();
+        public LinkedList<Instruccion> listaInstrucciones = new LinkedList<Instruccion>();
         public Bloque()
         {
         }

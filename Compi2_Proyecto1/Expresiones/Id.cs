@@ -23,7 +23,7 @@ namespace Compi2_Proyecto1.Expresiones
 
         public override Expresion getValor(Entorno ent)
         {
-            MessageBox.Show("Estoy en el get valor de la variable "+id);
+            //MessageBox.Show("Estoy en el get valor de la variable "+id);
             Variable sim = ent.buscar(id, linea, columna, "La variable");
             if (sim != null)
             { //Si se encontró la variable

@@ -80,6 +80,8 @@ namespace Compi2_Proyecto1.Analizador
             var tend = ToTerm("end");
             var twhile = ToTerm("while");
             var tdo = ToTerm("do");
+            var tcase = ToTerm("case");
+            var tof = ToTerm("of");
 
             #endregion
 
@@ -110,12 +112,16 @@ namespace Compi2_Proyecto1.Analizador
             NonTerminal E = new NonTerminal("E");
             NonTerminal L_IDS = new NonTerminal("L_IDS");
             NonTerminal L_IDS_Accesos = new NonTerminal("L_IDS_Accesos");
+            NonTerminal L_Expresiones = new NonTerminal("L_Expresiones");
             NonTerminal TIPO = new NonTerminal("TIPO");
 
             NonTerminal SENT_IF = new NonTerminal("SENT_IF");
             NonTerminal L_IF = new NonTerminal("L_IF");
             NonTerminal BLOQUE = new NonTerminal("BLOQUE");
             NonTerminal SENT_WHILE = new NonTerminal("SENT_WHILE");
+            NonTerminal SENT_SWITCH = new NonTerminal("SENT_SWITCH");
+            NonTerminal L_BLOQUES_CASE = new NonTerminal("L_BLOQUES_CASE");
+            NonTerminal BLOQUE_DEFAULT = new NonTerminal("BLOQUE_DEFAULT");
 
             #endregion
 
@@ -135,7 +141,16 @@ namespace Compi2_Proyecto1.Analizador
                 |SENT_IF + ptcoma
                 |SENT_WHILE + ptcoma
                 |BLOQUE +punto      //El unico bloque independiente es el *Main*
+                |SENT_SWITCH + ptcoma
                 ;
+
+            SENT_SWITCH.Rule = tcase + parIzquierdo + E + parDerecho + tof + L_BLOQUES_CASE + tend;
+
+            L_BLOQUES_CASE.Rule = L_BLOQUES_CASE + BLOQUE_DEFAULT
+                |BLOQUE_DEFAULT;
+
+            BLOQUE_DEFAULT.Rule = E + dospuntos + BLOQUE
+                |telse + BLOQUE;
 
             SENT_WHILE.Rule = twhile + E + tdo + BLOQUE;
 
@@ -155,13 +170,13 @@ namespace Compi2_Proyecto1.Analizador
                 ;
 
             IMPRESION.Rule = 
-                twrite + parIzquierdo + E + parDerecho
-                |twriteln + parIzquierdo + E + parDerecho;
+                twrite + parIzquierdo + L_Expresiones + parDerecho
+                |twriteln + parIzquierdo + L_Expresiones + parDerecho;
 
             ASIGNACION.Rule = ID + dospuntos + igualdad + E;
 
-            DECLARACION.Rule = tvar + L_IDS + dospuntos + TIPO
-                | tvar + ID + dospuntos + TIPO + igualdad + E
+            DECLARACION.Rule = tvar + ID + dospuntos + TIPO + igualdad + E
+                | tvar + L_IDS + dospuntos + TIPO 
                 ;
 
             TIPO.Rule = tString
@@ -198,6 +213,10 @@ namespace Compi2_Proyecto1.Analizador
                 |tfalse
                 |cadena
                 |L_IDS_Accesos
+                ;
+
+            L_Expresiones.Rule = L_Expresiones + coma + E
+                |E
                 ;
 
             L_IDS_Accesos.Rule = L_IDS_Accesos + punto + ID

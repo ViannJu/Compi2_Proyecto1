@@ -12,9 +12,15 @@ namespace Compi2_Proyecto1.Instrucciones
 
     public class Impresion : Instruccion
     {
-
+        LinkedList<Expresion> listaExpresiones = new LinkedList<Expresion>();
         Expresion valor;
         Boolean salto;
+
+        public Impresion(LinkedList<Expresion> listaExpresiones, Boolean salto){
+
+            this.listaExpresiones = listaExpresiones;
+            this.salto = salto;
+        }
 
         public Impresion(Expresion valor, Boolean salto) {
 
@@ -26,18 +32,27 @@ namespace Compi2_Proyecto1.Instrucciones
         public override object ejecutar(Entorno ent)
         {
             //Expresion anterior = this.valor.getValor(ent);    //por la lista de accesos
-            Expresion resultado = valor.getValor(ent);            
+            //Expresion resultado = valor.getValor(ent);            
+            String mensajeCompleto = "";
 
-            if (resultado.tipo.tipo != Tipo.enumTipo.error) {
-                //si no es un error entonces imprimimos
-                if (salto)
-                {
-                    MasterClass.Instance.addMessage(resultado.valor.ToString(), true);
+            foreach (Expresion exp in this.listaExpresiones) {
+
+                var resultado = exp.getValor(ent);
+
+                if (resultado.tipo.tipo != Tipo.enumTipo.error) {
+
+                    mensajeCompleto += resultado.valor.ToString();
+
                 }
-                else {
-                    MasterClass.Instance.addMessage(resultado.valor.ToString(), false);
-                }
-                
+
+            } 
+            //si no es un error entonces imprimimos
+            if (salto)
+            {
+                MasterClass.Instance.addMessage(mensajeCompleto, true);
+            }
+            else {
+                MasterClass.Instance.addMessage(mensajeCompleto, false);
             }
 
             return null;

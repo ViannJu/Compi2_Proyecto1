@@ -66,6 +66,35 @@ namespace Compi2_Proyecto1.Analizador
             //Como se llama la instruccion que viene
             switch (nodo.ChildNodes[0].Term.Name) {
 
+                case "SENT_SWITCH":
+                    //tcase + parIzquierdo + E + parDerecho + tof + L_BLOQUES_CASE + tend
+
+                    //Mando a traer la expresion 
+                    Expresion exp2 = evaluarExpresion(nodo.ChildNodes[0].ChildNodes[2]);
+
+                    //Mando a traer la lista de bloques
+                    LinkedList<Bloque> listaBloques = new LinkedList<Bloque>();
+                    evaluarBloques_Case(nodo.ChildNodes[0].ChildNodes[5], listaBloques);
+
+                    Instruccion temp2;
+                    temp2 = new Switch(exp2, listaBloques);
+
+
+                    //Si es un bloque se guarda en la lista de instrucciones de bloque
+                    if (bloque)
+                    {
+                        guardadosInstruccion.AddLast(temp2);
+                    }
+                    //Si no es un bloque es la lista general de instrucciones de MasterClass
+                    else
+                    {
+                        //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                        MasterClass.Instance.addInstruction(temp2);
+                        //MessageBox.Show("guarde el bloque en la masterclass");
+                    }
+                    break;
+
+
                 case "SENT_WHILE":
                     //twhile + E + tdo + BLOQUE;
 
@@ -299,13 +328,15 @@ namespace Compi2_Proyecto1.Analizador
                 case "IMPRESION":
 
                     //no tiene salto de linea
+                    //twrite + parIzquierdo + L_Expresiones + parDerecho
                     if (nodo.ChildNodes[0].ChildNodes[0].Term.Name == "write") {
 
-                        //primero mando a traer la expresion;
-                        Expresion expression = evaluarExpresion(nodo.ChildNodes[0].ChildNodes[2]);
+                        //primero mando a traer la lista de expresiones;
+                        LinkedList<Expresion> listaExpresiones = new LinkedList<Expresion>();
+                        listaExpresiones = evaluarL_Expresiones(nodo.ChildNodes[0].ChildNodes[2], listaExpresiones);
 
                         Instruccion temp;
-                        temp = new Impresion(expression, false);
+                        temp = new Impresion(listaExpresiones, false);
 
                         //Si es un bloque se guarda en la lista de instrucciones de bloque
                         if (bloque)
@@ -318,21 +349,18 @@ namespace Compi2_Proyecto1.Analizador
                             //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
                             MasterClass.Instance.addInstruction(temp);
                         }
-
-
-
                     }
-                    
+
                     //tiene salto de linea
+                    //twriteln + parIzquierdo + L_Expresiones + parDerecho;
                     else if (nodo.ChildNodes[0].ChildNodes[0].Term.Name == "writeln") {
 
-                        //primero mando a traer la expresion;
-                        Expresion expression = evaluarExpresion(nodo.ChildNodes[0].ChildNodes[2]);
+                        //primero mando a traer la lista de Expresiones
+                        LinkedList<Expresion> listaExpresiones = new LinkedList<Expresion>();
+                        listaExpresiones = evaluarL_Expresiones(nodo.ChildNodes[0].ChildNodes[2], listaExpresiones);
 
                         Instruccion temp;
-                        temp = new Impresion(expression, true);
-
-
+                        temp = new Impresion(listaExpresiones, true);
 
                         //Si es un bloque se guarda en la lista de instrucciones de bloque
                         if (bloque)
@@ -353,6 +381,58 @@ namespace Compi2_Proyecto1.Analizador
 
                 
 
+            }
+
+        }
+
+        private void evaluarBloques_Case(ParseTreeNode nodo, LinkedList<Bloque> listaBloques) {
+            //L_BLOQUES_CASE + BLOQUE_DEFAULT
+            if (nodo.ChildNodes.Count == 2) {
+
+                evaluarBloques_Case(nodo.ChildNodes[0], listaBloques);
+                evaluarBloques_Default(nodo.ChildNodes[1], listaBloques);
+
+            } 
+            //BLOQUES_DEFAULT
+            else if (nodo.ChildNodes.Count == 1) {
+
+                evaluarBloques_Default(nodo.ChildNodes[0], listaBloques);
+
+            }
+
+        }
+
+        private void evaluarBloques_Default(ParseTreeNode nodo, LinkedList<Bloque> listaBloques) {
+
+            //E + dospuntos + BLOQUE
+            if (nodo.ChildNodes.Count == 3) {
+
+                //Mando a traer la expresion
+                Expresion exp = evaluarExpresion(nodo.ChildNodes[0]);
+
+                //Mando a traer el Bloque beginEnd
+                Bloque bloque = evaluarBloque(nodo.ChildNodes[2]);
+
+                //Mando a traer la lista de instruccioes
+
+                //creamos el objeto bloque 
+                Bloques_Case littleCase = new Bloques_Case(exp,bloque);
+
+                //guardamos en la lista
+                listaBloques.AddLast(littleCase);
+
+            }
+            //telse + BLOQUE;
+            else if (nodo.ChildNodes.Count == 2) {
+
+                //Mandamos a traer el bloque
+                Bloque bloque = evaluarBloque(nodo.ChildNodes[1]);
+
+                //creamos el objeto bloque
+                Bloques_Default littleDefault = new Bloques_Default(bloque);
+
+                //guardamos en la lista
+                listaBloques.AddLast(littleDefault);
             }
 
         }
@@ -409,8 +489,41 @@ namespace Compi2_Proyecto1.Analizador
             }
 
              lego = new Bloque();
-             return lego;
-            
+             return lego;            
+
+        }
+
+        private LinkedList<Instruccion> evaluarL_Instrucciones_Bloque(ParseTreeNode nodo) {
+
+            LinkedList<Instruccion> mylistaInstrucciones = new LinkedList<Instruccion>();
+
+            evaluarL_Instrucciones(nodo.ChildNodes[1], true, mylistaInstrucciones);
+
+            return mylistaInstrucciones;
+        }
+
+        private LinkedList<Expresion> evaluarL_Expresiones(ParseTreeNode nodo, LinkedList<Expresion> listaExpresiones) {
+            //L_Expresiones + coma + E
+            if (nodo.ChildNodes.Count == 3) {
+
+                evaluarL_Expresiones(nodo.ChildNodes[0], listaExpresiones);
+                //El siguiente es una expresion entonces lo guardamos en la lista
+                Expresion expri = evaluarExpresion(nodo.ChildNodes[2]);
+
+                listaExpresiones.AddLast(expri);
+
+            }
+            //E
+            else if (nodo.ChildNodes.Count == 1) {
+
+                //Mando a traer la expresion
+                Expresion expri = evaluarExpresion(nodo.ChildNodes[0]);
+
+                //lo guardamos en la lista
+                listaExpresiones.AddLast(expri);
+            }
+
+            return listaExpresiones;
 
         }
 
