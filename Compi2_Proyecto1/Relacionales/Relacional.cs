@@ -616,7 +616,7 @@ namespace Compi2_Proyecto1.Relacionales
                     }
                     break;
 
-                case "==":
+                case "=":
                     switch (resultado1.tipo.tipo)
                     {
                         case Tipo.enumTipo.entero:

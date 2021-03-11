@@ -27,7 +27,7 @@ namespace Compi2_Proyecto1.Expresiones
             Variable sim = ent.buscar(id, linea, columna, "La variable");
             if (sim != null)
             { //Si se encontró la variable
-                MessageBox.Show("Si se encontro la variable " + id);
+                //MessageBox.Show("Si se encontro la variable " + id);
                 Primitivo retorno = new Primitivo(sim.tipo, sim.valor);
                 //retorna tal cual el valor
                 return retorno;

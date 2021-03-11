@@ -19,5 +19,6 @@ namespace Compi2_Proyecto1.Principales
         //funcion abstracta para gestionar el stringDot de cada expresion
         public abstract string getDot();
 
+
     }
 }

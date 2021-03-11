@@ -95,7 +95,7 @@ namespace Compi2_Proyecto1.Control
 
             }
 
-            MasterClass.Display.RemoveLast();
+            MasterClass.Display.RemoveFirst();
             this.execUno = false;
             return null;
         }

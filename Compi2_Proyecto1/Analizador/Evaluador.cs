@@ -36,6 +36,12 @@ namespace Compi2_Proyecto1.Analizador
             {
                 //significa que la cadena de entrada contiene errores, por ello no se generó el arbol de analisis sintactico. 
                 MasterClass.Instance.addMessage("Entrada incorrecta", true);
+
+                foreach (var error in arbol.ParserMessages) {
+
+                    MasterClass.Instance.addError(new C_Error("Lexico/Sintactico", error.Message, error.Location.Line, error.Location.Column));
+                }
+
             }
             else
             {
@@ -65,6 +71,80 @@ namespace Compi2_Proyecto1.Analizador
 
             //Como se llama la instruccion que viene
             switch (nodo.ChildNodes[0].Term.Name) {
+
+                //tfor + ASIGNACION + tto + E + tdo + BLOQUE;
+                case "SENT_FOR":
+
+                    //verificamos el valor del hijo2
+
+                    //Mando a traer el objeto Asignacion como instruccion
+                    Instruccion myAsignacion = evaluarAsignacion(nodo.ChildNodes[0].ChildNodes[1]);
+
+                    //Mando a traer el id del objeto asignacion
+                    String identificadorAsignacion = nodo.ChildNodes[0].ChildNodes[1].ChildNodes[0].Token.ValueString;
+
+                    //Mando a traer la expresion del valor final
+                    Expresion exp4 = evaluarExpresion(nodo.ChildNodes[0].ChildNodes[3]);
+
+                    //Mando a traer el bloque de instrucciones
+                    Bloque bloque4 = evaluarBloque(nodo.ChildNodes[0].ChildNodes[5]);
+
+                    bool incremental = true;
+                    //Mandamos si es Up_to
+                    if (nodo.ChildNodes[0].ChildNodes[2].Term.Name == "to")
+                    {
+                        incremental = true;
+                    }
+                    else if (nodo.ChildNodes[0].ChildNodes[2].Term.Name == "downto") {
+
+                        incremental = false;
+                    }
+
+
+
+                    //debo enviar Instruccion InsInicial, String nombreVarAsignacion, Expresion valorFinal, Bloque instrucciones, bool up_to
+                    Instruccion temp4 = new For(myAsignacion, identificadorAsignacion, exp4, bloque4, incremental);
+
+                    //Si es un bloque se guarda en la lista de instrucciones de bloque
+                    if (bloque)
+                    {
+                        guardadosInstruccion.AddLast(temp4);
+                    }
+                    //Si no es un bloque es la lista general de instrucciones de MasterClass
+                    else
+                    {
+                        //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                        MasterClass.Instance.addInstruction(temp4);
+                        //MessageBox.Show("guarde el bloque en la masterclass");
+                    }
+                    break;
+
+                case "SENT_REPEAT_UNTIL":
+                    //trepeat + BLOQUE + tuntil + E;
+
+                    //Mando a traer el bloque
+                    Bloque block1 = evaluarBloque(nodo.ChildNodes[0].ChildNodes[1]);
+
+                    //Mando a traer la expresion
+                    Expresion exp3 = evaluarExpresion(nodo.ChildNodes[0].ChildNodes[3]);
+
+                    Instruccion temp3;
+                    temp3 = new Repeat_Until(block1, exp3);
+
+                    //Si es un bloque se guarda en la lista de instrucciones de bloque
+                    if (bloque)
+                    {
+                        guardadosInstruccion.AddLast(temp3);
+                    }
+                    //Si no es un bloque es la lista general de instrucciones de MasterClass
+                    else
+                    {
+                        //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                        MasterClass.Instance.addInstruction(temp3);
+                        //MessageBox.Show("guarde el bloque en la masterclass");
+                    }
+                    break;
+
 
                 case "SENT_SWITCH":
                     //tcase + parIzquierdo + E + parDerecho + tof + L_BLOQUES_CASE + tend
@@ -232,14 +312,14 @@ namespace Compi2_Proyecto1.Analizador
 
                     //por el momento solo le envio el id de la variable y la expresion
                     String nombreVar = nodo.ChildNodes[0].ChildNodes[0].Token.ValueString;
-                    MessageBox.Show("El nombre de la variable es: "+nombreVar);
+                    //MessageBox.Show("El nombre de la variable es: "+nombreVar);
 
                     //Mando a traer la expresion
                     Expresion exp = evaluarExpresion(nodo.ChildNodes[0].ChildNodes[3]);
 
                     //Creo el objeto instruccion
                     Instruccion temporal;
-                    temporal = new Asignacion(nombreVar, exp, 0, 0);
+                    temporal = new Asignacion(nombreVar, exp, nodo.ChildNodes[0].Token.Location.Line, nodo.ChildNodes[0].Token.Location.Column);
 
                     //Si es un bloque se guarda en la lista de instrucciones de bloque
                     if (bloque)
@@ -294,9 +374,19 @@ namespace Compi2_Proyecto1.Analizador
                     else {
 
                         //Declaracion/Asignacion
-                        //tvar + ID + dospuntos + TIPO + igualdad + E
+                        //tvar + L_IDS + dospuntos + TIPO + igualdad + E
 
-                        string identificador = nodo.ChildNodes[0].ChildNodes[1].Token.ValueString;
+                        //string identificador = nodo.ChildNodes[0].ChildNodes[1].Token.ValueString;
+
+                        //Mando a traer al identificador en L_IDS.Count = 1
+                        LinkedList<String> listaIDS = new LinkedList<string>();
+                        evaluarL_IDS(nodo.ChildNodes[0].ChildNodes[1], listaIDS);
+                        String identificador = "";
+
+                        if (listaIDS.Count == 1) {
+
+                            identificador = listaIDS.First.Value;
+                        }
 
                         //Tengo que mandar el tipo
                         Tipo tipe = evaluarTipo(nodo.ChildNodes[0].ChildNodes[3]);
@@ -376,12 +466,27 @@ namespace Compi2_Proyecto1.Analizador
 
                     }
 
-                    break;
-
-
-                
+                    break;                
 
             }
+
+        }
+
+        private Instruccion evaluarAsignacion(ParseTreeNode nodo) {
+
+            //ID + dospuntos + igualdad + E;
+
+            //por el momento solo le envio el id de la variable y la expresion
+            String nombreVar = nodo.ChildNodes[0].Token.ValueString;
+            //MessageBox.Show("El nombre de la variable es: "+nombreVar);
+
+            //Mando a traer la expresion
+            Expresion exp = evaluarExpresion(nodo.ChildNodes[3]);
+
+            //Creo el objeto instruccion
+            Instruccion temporal = new Asignacion(nombreVar, exp, 0, 0);
+
+            return temporal;
 
         }
 
@@ -585,7 +690,6 @@ namespace Compi2_Proyecto1.Analizador
                 switch (nodo.ChildNodes[1].Term.Name) {
 
                     case "+":
-                        MessageBox.Show("Entre a suma");
                         return new Suma(evaluarExpresion(nodo.ChildNodes[0]), evaluarExpresion(nodo.ChildNodes[2]), 0, 0);
                     case "-":
                         return new Resta(evaluarExpresion(nodo.ChildNodes[0]), evaluarExpresion(nodo.ChildNodes[2]), 0, 0);
@@ -603,8 +707,8 @@ namespace Compi2_Proyecto1.Analizador
                         return new Relacional(evaluarExpresion(nodo.ChildNodes[0]), evaluarExpresion(nodo.ChildNodes[2]), ">=", 0, 0);
                     case "<=":
                         return new Relacional(evaluarExpresion(nodo.ChildNodes[0]), evaluarExpresion(nodo.ChildNodes[2]), "<=", 0, 0);
-                    case "==":
-                        return new Relacional(evaluarExpresion(nodo.ChildNodes[0]), evaluarExpresion(nodo.ChildNodes[2]), "==", 0, 0);
+                    case "=":
+                        return new Relacional(evaluarExpresion(nodo.ChildNodes[0]), evaluarExpresion(nodo.ChildNodes[2]), "=", 0, 0);
                     case "<>":
                         return new Relacional(evaluarExpresion(nodo.ChildNodes[0]), evaluarExpresion(nodo.ChildNodes[2]), "!=", 0, 0);
                     case "or":
@@ -652,8 +756,14 @@ namespace Compi2_Proyecto1.Analizador
 
             switch (nodo.Term.Name) {
 
-                case "num":
+                case "entero":
+
+                    if (nodo.Token.Value.GetType() == Type.GetType("System.Double")) {
+
+                        return new Primitivo(new Tipo(Tipo.enumTipo.real), float.Parse(nodo.Token.ValueString));
+                    }
                     return new Primitivo(new Tipo(Tipo.enumTipo.entero), int.Parse(nodo.Token.ValueString));
+
                 case "real":
                     return new Primitivo(new Tipo(Tipo.enumTipo.real), float.Parse(nodo.Token.ValueString));
                 case "cadena":

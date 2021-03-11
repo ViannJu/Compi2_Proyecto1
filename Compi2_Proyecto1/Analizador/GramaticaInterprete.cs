@@ -21,8 +21,8 @@ namespace Compi2_Proyecto1.Analizador
             CommentTerminal commentUnilinea = new CommentTerminal("comentarioLinea", "//", "\n", "\r\n"); //si viene una nueva linea se termina de reconocer el comentario.
             CommentTerminal commentMultilinea1 = new CommentTerminal("comentarioBloque", "(*", "*)");
             CommentTerminal commentMultilinea2 = new CommentTerminal("comentarioBloque", "{", "*)");
-            RegexBasedTerminal entero = new RegexBasedTerminal("num", "[0-9]+");
-            RegexBasedTerminal real = new RegexBasedTerminal("real", "[0-9]+.[0-9]+");
+            NumberLiteral entero = new NumberLiteral("entero");
+            //RegexBasedTerminal real = new RegexBasedTerminal("real", "[0-9]+.[0-9]+");
             //RegexBasedTerminal ID = new RegexBasedTerminal("id", "[A-ZÑa-zñ][_0-9A-ZÑa-zñ]*");
             IdentifierTerminal ID = new IdentifierTerminal("id");
             StringLiteral cadena = new StringLiteral("cadena", "'"); /* se indica que la cadena va a empezar con ' (comillas simples) y con esto acepta cualquier cosa que venga despues de las comillas dobles */
@@ -82,6 +82,11 @@ namespace Compi2_Proyecto1.Analizador
             var tdo = ToTerm("do");
             var tcase = ToTerm("case");
             var tof = ToTerm("of");
+            var trepeat = ToTerm("repeat");
+            var tuntil = ToTerm("until");
+            var tto = ToTerm("to");
+            var tfor = ToTerm("for");
+            var tdownto = ToTerm("downto");
 
             #endregion
 
@@ -122,6 +127,8 @@ namespace Compi2_Proyecto1.Analizador
             NonTerminal SENT_SWITCH = new NonTerminal("SENT_SWITCH");
             NonTerminal L_BLOQUES_CASE = new NonTerminal("L_BLOQUES_CASE");
             NonTerminal BLOQUE_DEFAULT = new NonTerminal("BLOQUE_DEFAULT");
+            NonTerminal SENT_REPEAT_UNTIL = new NonTerminal("SENT_REPEAT_UNTIL");
+            NonTerminal SENT_FOR = new NonTerminal("SENT_FOR");
 
             #endregion
 
@@ -142,7 +149,15 @@ namespace Compi2_Proyecto1.Analizador
                 |SENT_WHILE + ptcoma
                 |BLOQUE +punto      //El unico bloque independiente es el *Main*
                 |SENT_SWITCH + ptcoma
+                |SENT_REPEAT_UNTIL + ptcoma
+                |SENT_FOR + ptcoma
                 ;
+
+            SENT_FOR.Rule = tfor + ASIGNACION + tto + E + tdo + BLOQUE
+                |tfor + ASIGNACION + tdownto + E + tdo + BLOQUE
+                ;
+
+            SENT_REPEAT_UNTIL.Rule = trepeat + BLOQUE + tuntil + E;
 
             SENT_SWITCH.Rule = tcase + parIzquierdo + E + parDerecho + tof + L_BLOQUES_CASE + tend;
 
@@ -175,8 +190,8 @@ namespace Compi2_Proyecto1.Analizador
 
             ASIGNACION.Rule = ID + dospuntos + igualdad + E;
 
-            DECLARACION.Rule = tvar + ID + dospuntos + TIPO + igualdad + E
-                | tvar + L_IDS + dospuntos + TIPO 
+            DECLARACION.Rule = tvar + L_IDS + dospuntos + TIPO
+                | tvar + L_IDS + dospuntos + TIPO + igualdad + E
                 ;
 
             TIPO.Rule = tString
@@ -202,13 +217,14 @@ namespace Compi2_Proyecto1.Analizador
                 |E + menorigual + E
                 |E + diferenteque + E
                 |E + igualigual + E
+                |E + igualdad + E
                 |E + or + E
                 |E + and + E
                 |not + E
                 |parIzquierdo + E + parDerecho
                 |menos + E  //para manejar numeros negativos
                 |entero
-                |real
+                //|real
                 |ttrue
                 |tfalse
                 |cadena
