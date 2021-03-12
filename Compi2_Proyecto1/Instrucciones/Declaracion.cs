@@ -8,11 +8,12 @@ namespace Compi2_Proyecto1.Instrucciones
 {
     public class Declaracion : Instruccion
     {
-        Tipo tipo;
+        public Tipo tipo;
         string id;
-        LinkedList<string> IDS;
+        public LinkedList<string> IDS;
         public Expresion valor;
 
+        public Declaracion() { }    //Solamente para capturar el tipo
         public Declaracion(Tipo tipo, String id, Expresion valor, int linea, int columna)
         {
             this.tipo = tipo;

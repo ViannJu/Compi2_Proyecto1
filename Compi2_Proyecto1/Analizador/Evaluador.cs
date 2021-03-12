@@ -319,7 +319,7 @@ namespace Compi2_Proyecto1.Analizador
 
                     //Creo el objeto instruccion
                     Instruccion temporal;
-                    temporal = new Asignacion(nombreVar, exp, nodo.ChildNodes[0].Token.Location.Line, nodo.ChildNodes[0].Token.Location.Column);
+                    temporal = new Asignacion(nombreVar, exp, 0,0);
 
                     //Si es un bloque se guarda en la lista de instrucciones de bloque
                     if (bloque)
