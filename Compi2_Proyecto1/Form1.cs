@@ -44,6 +44,7 @@ namespace Compi2_Proyecto1
 
             MasterClass.Instance.ejecutar();
             MasterClass.Instance.ifMistakes();
+            MasterClass.Instance.showAllErrors();
             this.richTextBox3.Text = MasterClass.Instance.getMessages();
         }
     }

@@ -84,7 +84,9 @@ namespace Compi2_Proyecto1.Analizador
 
         public void showAllErrors() {
             foreach (C_Error mistake in this.listaErrores) {
-                Console.WriteLine(mistake.getDescripcionError());
+                //Console.WriteLine(mistake.getDescripcionError());
+                this.addMessage(mistake.getDescripcionError(), true);
+                //MessageBox.Show(mistake.getDescripcionError());
             }
         }
 

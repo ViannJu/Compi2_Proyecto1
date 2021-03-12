@@ -46,20 +46,137 @@ namespace Compi2_Proyecto1.Analizador
             else
             {
                 MasterClass.Instance.addMessage("/****    Entrada correcta    ****/", true);
-                evaluarL_Instrucciones(raiz.ChildNodes[3], false, null);
+                evaluarL_Instrucciones_Principales(raiz.ChildNodes[3]);
             }
 
         }
 
         /********** AQUI EMPEZAMOS A CONSTRUIR EL ARBOL DE ANALISIS SINTACTICO **********/
 
-        private void evaluarL_Instrucciones(ParseTreeNode nodo, bool bloque, LinkedList<Instruccion> guardadosBloque) {
+        private void evaluarL_Instrucciones_Principales(ParseTreeNode nodo) {
             if (nodo.ChildNodes.Count == 2) {
-                //L_Instrucciones = L_Instrucciones + Instruccion + ptcoma
+                //L_Instrucciones_Principales = L_Instrucciones_Principales + Instruccion_Principal
+                evaluarL_Instrucciones_Principales(nodo.ChildNodes[0]);
+                evaluarInstruccionPrincipal(nodo.ChildNodes[1]);
+
+            } else if (nodo.ChildNodes.Count == 1) {
+                //L_Instrucciones_Principales = InstruccionPrincipal
+                evaluarInstruccionPrincipal(nodo.ChildNodes[0]);
+
+            }
+        }
+
+        private void evaluarInstruccionPrincipal(ParseTreeNode nodo ) {
+
+            switch (nodo.ChildNodes[0].Term.Name) {
+
+                case "BLOQUE":
+                    //entonces el bloque tiene instrucciones
+                    if (nodo.ChildNodes[0].ChildNodes.Count == 3)
+                    {
+
+                        //mandamos a traer la lista de instrucciones
+                        LinkedList<Instruccion> listaInsBloque = new LinkedList<Instruccion>();
+                        evaluarL_Instrucciones(nodo.ChildNodes[0].ChildNodes[1], true, listaInsBloque);
+
+                        Instruccion temp;
+                        temp = new Bloque(listaInsBloque);
+
+                        //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                        MasterClass.Instance.addInstruction(temp);
+                        //MessageBox.Show("guarde el bloque en la masterclass");
+
+                    }
+                    //entonces el bloque no tiene instrucciones
+                    else if (nodo.ChildNodes[0].ChildNodes.Count == 2)
+                    {
+
+                        Instruccion temp;
+                        temp = new Bloque();
+
+                        //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                        MasterClass.Instance.addInstruction(temp);
+
+                    }
+                    break;
+
+                case "DECLARACION":
+                    if (nodo.ChildNodes[0].ChildNodes.Count == 4)
+                    {
+                        //tvar + L_IDS + dospuntos + TIPO
+                        //Lista de declaraciones
+                        LinkedList<string> listaIDS = new LinkedList<string>();
+
+                        //tengo que mandar a traer la lista de ID's
+                        evaluarL_IDS(nodo.ChildNodes[0].ChildNodes[1], listaIDS);
+
+                        //MasterClass.Instance.addMessage("La lista de ids tiene: " + listaIDS.Count, true);
+
+                        //Tengo que mandar el tipo 
+                        Tipo tipe = evaluarTipo(nodo.ChildNodes[0].ChildNodes[3]);
+
+                        Instruccion temp;
+                        temp = new Declaracion(tipe, listaIDS, 0, 0);
+
+                        //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                        MasterClass.Instance.addInstruction(temp);
+
+                    }
+                    else
+                    {
+                        //Declaracion/Asignacion
+                        //tvar + L_IDS + dospuntos + TIPO + igualdad + E
+
+                        //string identificador = nodo.ChildNodes[0].ChildNodes[1].Token.ValueString;
+
+                        //Mando a traer al identificador en L_IDS.Count = 1
+                        LinkedList<String> listaIDS = new LinkedList<string>();
+                        evaluarL_IDS(nodo.ChildNodes[0].ChildNodes[1], listaIDS);
+                        String identificador = "";
+
+                        if (listaIDS.Count == 1)
+                        {
+
+                            identificador = listaIDS.First.Value;
+                        }
+
+                        //Tengo que mandar el tipo
+                        Tipo tipe = evaluarTipo(nodo.ChildNodes[0].ChildNodes[3]);
+
+                        //Tengo que mandar la Expresion
+                        Expresion expression = evaluarExpresion(nodo.ChildNodes[0].ChildNodes[5]);
+
+                        //Mandamos la declaracion
+                        Instruccion temp;
+                        temp = new Declaracion(tipe, identificador, expression, 0, 0);
+
+                        //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                        MasterClass.Instance.addInstruction(temp);
+
+
+                    }
+
+                    break;
+
+                case "DECLARACION_MF":
+                    break;
+
+            }
+
+        }
+
+        private void evaluarL_Instrucciones(ParseTreeNode nodo, bool bloque, LinkedList<Instruccion> guardadosBloque)
+        {
+            if (nodo.ChildNodes.Count == 2)
+            {
+                //L_Instrucciones_Principales = L_Instrucciones_Principales + Instruccion_Principal
                 evaluarL_Instrucciones(nodo.ChildNodes[0], bloque, guardadosBloque);
                 evaluarInstruccion(nodo.ChildNodes[1], bloque, guardadosBloque);
-            } else if (nodo.ChildNodes.Count == 1) {
-                //L_Instrucciones = Instruccion + ptcoma
+
+            }
+            else if (nodo.ChildNodes.Count == 1)
+            {
+                //L_Instrucciones_Principales = InstruccionPrincipal
                 evaluarInstruccion(nodo.ChildNodes[0], bloque, guardadosBloque);
 
             }
@@ -258,55 +375,6 @@ namespace Compi2_Proyecto1.Analizador
                     break;
 
 
-
-                case "BLOQUE":
-                    //entonces el bloque tiene instrucciones
-                    if (nodo.ChildNodes[0].ChildNodes.Count == 3)
-                    {
-
-                        //mandamos a traer la lista de instrucciones
-                        LinkedList<Instruccion> listaInsBloque = new LinkedList<Instruccion>();
-                        evaluarL_Instrucciones(nodo.ChildNodes[0].ChildNodes[1], true, listaInsBloque);
-
-                        Instruccion temp;
-                        temp = new Bloque(listaInsBloque);
-
-                        //Si es un bloque se guarda en la lista de instrucciones de bloque
-                        if (bloque)
-                        {
-                            guardadosInstruccion.AddLast(temp);
-                        }
-                        //Si no es un bloque es la lista general de instrucciones de MasterClass
-                        else
-                        {
-                            //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
-                            MasterClass.Instance.addInstruction(temp);
-                            //MessageBox.Show("guarde el bloque en la masterclass");
-                        }
-
-                    }
-                    //entonces el bloque no tiene instrucciones
-                    else if (nodo.ChildNodes[0].ChildNodes.Count == 2)
-                    {
-
-                        Instruccion temp;
-                        temp = new Bloque();
-
-                        //Si es un bloque se guarda en la lista de instrucciones de bloque
-                        if (bloque)
-                        {
-                            guardadosInstruccion.AddLast(temp);
-                        }
-                        //Si no es un bloque es la lista general de instrucciones de MasterClass
-                        else
-                        {
-                            //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
-                            MasterClass.Instance.addInstruction(temp);
-                        }
-
-                    }
-                    break;
-
                 case "ASIGNACION":
                     //ID + dospuntos + igualdad + E;
 
@@ -337,83 +405,6 @@ namespace Compi2_Proyecto1.Analizador
 
                     break;
 
-                //Declaracion
-                case "DECLARACION":
-                    if (nodo.ChildNodes[0].ChildNodes.Count == 4)
-                    {
-                        //tvar + L_IDS + dospuntos + TIPO
-                        //Lista de declaraciones
-                        LinkedList<string> listaIDS = new LinkedList<string>();
-
-                        //tengo que mandar a traer la lista de ID's
-                        evaluarL_IDS(nodo.ChildNodes[0].ChildNodes[1], listaIDS);
-
-                        //MasterClass.Instance.addMessage("La lista de ids tiene: " + listaIDS.Count, true);
-
-                        //Tengo que mandar el tipo 
-                        Tipo tipe = evaluarTipo(nodo.ChildNodes[0].ChildNodes[3]);
-
-                        Instruccion temp;
-                        temp = new Declaracion(tipe, listaIDS, 0, 0);
-
-
-                        //Si es un bloque se guarda en la lista de instrucciones de bloque
-                        if (bloque)
-                        {
-                            guardadosInstruccion.AddLast(temp);
-                        }
-                        //Si no es un bloque es la lista general de instrucciones de MasterClass
-                        else {
-                            //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
-                            MasterClass.Instance.addInstruction(temp);
-                        }
-                        
-                        
-                        
-                    }
-                    else {
-
-                        //Declaracion/Asignacion
-                        //tvar + L_IDS + dospuntos + TIPO + igualdad + E
-
-                        //string identificador = nodo.ChildNodes[0].ChildNodes[1].Token.ValueString;
-
-                        //Mando a traer al identificador en L_IDS.Count = 1
-                        LinkedList<String> listaIDS = new LinkedList<string>();
-                        evaluarL_IDS(nodo.ChildNodes[0].ChildNodes[1], listaIDS);
-                        String identificador = "";
-
-                        if (listaIDS.Count == 1) {
-
-                            identificador = listaIDS.First.Value;
-                        }
-
-                        //Tengo que mandar el tipo
-                        Tipo tipe = evaluarTipo(nodo.ChildNodes[0].ChildNodes[3]);
-
-                        //Tengo que mandar la Expresion
-                        Expresion expression = evaluarExpresion(nodo.ChildNodes[0].ChildNodes[5]);
-
-                        //Mandamos la declaracion
-                        Instruccion temp;
-                        temp = new Declaracion(tipe, identificador, expression, 0, 0);
-
-                        //Si es un bloque se guarda en la lista de instrucciones de bloque
-                        if (bloque)
-                        {
-                            guardadosInstruccion.AddLast(temp);
-                        }
-                        //Si no es un bloque es la lista general de instrucciones de MasterClass
-                        else
-                        {
-                            //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
-                            MasterClass.Instance.addInstruction(temp);
-                        }
-
-
-                    }
-
-                    break;
 
                 case "IMPRESION":
 

@@ -20,7 +20,7 @@ namespace Compi2_Proyecto1.Analizador
 
             CommentTerminal commentUnilinea = new CommentTerminal("comentarioLinea", "//", "\n", "\r\n"); //si viene una nueva linea se termina de reconocer el comentario.
             CommentTerminal commentMultilinea1 = new CommentTerminal("comentarioBloque", "(*", "*)");
-            CommentTerminal commentMultilinea2 = new CommentTerminal("comentarioBloque", "{", "*)");
+            CommentTerminal commentMultilinea2 = new CommentTerminal("comentarioBloque", "{*", "*}");
             NumberLiteral entero = new NumberLiteral("entero");
             //RegexBasedTerminal real = new RegexBasedTerminal("real", "[0-9]+.[0-9]+");
             //RegexBasedTerminal ID = new RegexBasedTerminal("id", "[A-ZÑa-zñ][_0-9A-ZÑa-zñ]*");
@@ -88,6 +88,9 @@ namespace Compi2_Proyecto1.Analizador
             var tfor = ToTerm("for");
             var tdownto = ToTerm("downto");
 
+            var tfunction = ToTerm("function");
+            var tprocedure = ToTerm("procedure");
+
             #endregion
 
             #region PRIORIDAD
@@ -130,28 +133,70 @@ namespace Compi2_Proyecto1.Analizador
             NonTerminal SENT_REPEAT_UNTIL = new NonTerminal("SENT_REPEAT_UNTIL");
             NonTerminal SENT_FOR = new NonTerminal("SENT_FOR");
 
+            NonTerminal DECLARACION_MF = new NonTerminal("DECLARACION_MF");
+            NonTerminal L_DECLARACIONES = new NonTerminal("L_DECLARACIONES");
+            NonTerminal DECLARACION_ESPECIAL = new NonTerminal("DECLARACION_ESPECIAL");
+            NonTerminal L_DECLARACIONES_ESPECIALES = new NonTerminal("L_DECLARACIONES_ESPECIALES");
+
+            NonTerminal L_INSTRUCCIONES_PRINCIPALES = new NonTerminal("L_INSTRUCCIONES_PRINCIPALES");
+            NonTerminal INSTRUCCION_PRINCIPAL = new NonTerminal("INSTRUCCION_PRINCIPAL");
+
             #endregion
 
 
             #region Gramatica
 
-            INICIO.Rule = program + ID + ptcoma + L_INSTRUCCIONES;
+            INICIO.Rule = program + ID + ptcoma + L_INSTRUCCIONES_PRINCIPALES;
+
+            L_INSTRUCCIONES_PRINCIPALES.Rule = L_INSTRUCCIONES_PRINCIPALES + INSTRUCCION_PRINCIPAL
+                | INSTRUCCION_PRINCIPAL
+                ;
+
+            INSTRUCCION_PRINCIPAL.Rule =
+                 DECLARACION + ptcoma
+                | DECLARACION_MF + ptcoma
+                | BLOQUE + punto    //El unico bloque independiente es el *Main*
+                ;
+
+            DECLARACION_MF.Rule =
+                 tfunction + ID + parIzquierdo + L_DECLARACIONES_ESPECIALES + parDerecho + dospuntos + TIPO + ptcoma + L_DECLARACIONES + BLOQUE
+                | tprocedure + ID + parIzquierdo + L_DECLARACIONES_ESPECIALES + parDerecho + ptcoma + L_DECLARACIONES + BLOQUE
+                ;
+
+            L_DECLARACIONES_ESPECIALES.Rule = L_DECLARACIONES_ESPECIALES + ptcoma + DECLARACION_ESPECIAL
+                | DECLARACION_ESPECIAL
+                ;
+
+            L_DECLARACIONES.Rule = L_DECLARACIONES + DECLARACION + ptcoma
+                | DECLARACION + ptcoma
+                ;
+
+            DECLARACION_ESPECIAL.Rule = L_IDS + dospuntos + TIPO
+                | tvar + L_IDS + dospuntos + TIPO
+                ;
+
+            DECLARACION.Rule = tvar + L_IDS + dospuntos + TIPO
+                | tvar + L_IDS + dospuntos + TIPO + igualdad + E
+                ;
+
+            BLOQUE.Rule = tbegin + tend
+                | tbegin + L_INSTRUCCIONES + tend
+                ;
 
             L_INSTRUCCIONES.Rule = L_INSTRUCCIONES + INSTRUCCION
                 | INSTRUCCION              
                 ;
 
             INSTRUCCION.Rule =
-                 DECLARACION + ptcoma
-                |ASIGNACION + ptcoma
+                 ASIGNACION + ptcoma
                 |IMPRESION + ptcoma
                 |SENT_IF + ptcoma
                 |SENT_WHILE + ptcoma
-                |BLOQUE +punto      //El unico bloque independiente es el *Main*
                 |SENT_SWITCH + ptcoma
                 |SENT_REPEAT_UNTIL + ptcoma
                 |SENT_FOR + ptcoma
                 ;
+                        
 
             SENT_FOR.Rule = tfor + ASIGNACION + tto + E + tdo + BLOQUE
                 |tfor + ASIGNACION + tdownto + E + tdo + BLOQUE
@@ -175,24 +220,13 @@ namespace Compi2_Proyecto1.Analizador
 
             L_IF.Rule = L_IF + telse + tif + parIzquierdo + E + parDerecho + tthen + BLOQUE
                 |tif + parIzquierdo + E + parDerecho + tthen + BLOQUE
-                ;
-
-            //L_IF.Rule = MakePlusRule(L_IF, telse + tif + parIzquierdo + E + parDerecho + tthen + BLOQUE)
-             //   | tif + parIzquierdo + E + parDerecho + tthen + BLOQUE;
-
-            BLOQUE.Rule = tbegin + tend
-                |tbegin + L_INSTRUCCIONES + tend
-                ;
+                ;            
 
             IMPRESION.Rule = 
                 twrite + parIzquierdo + L_Expresiones + parDerecho
                 |twriteln + parIzquierdo + L_Expresiones + parDerecho;
 
-            ASIGNACION.Rule = ID + dospuntos + igualdad + E;
-
-            DECLARACION.Rule = tvar + L_IDS + dospuntos + TIPO
-                | tvar + L_IDS + dospuntos + TIPO + igualdad + E
-                ;
+            ASIGNACION.Rule = ID + dospuntos + igualdad + E;            
 
             TIPO.Rule = tString
                 |tint
@@ -242,6 +276,9 @@ namespace Compi2_Proyecto1.Analizador
                 |ID
                 ;
 
+
+            //L_IF.Rule = MakePlusRule(L_IF, telse + tif + parIzquierdo + E + parDerecho + tthen + BLOQUE)
+            //   | tif + parIzquierdo + E + parDerecho + tthen + BLOQUE;
 
             #endregion
 
