@@ -20,7 +20,7 @@ namespace Compi2_Proyecto1.Analizador
 
             CommentTerminal commentUnilinea = new CommentTerminal("comentarioLinea", "//", "\n", "\r\n"); //si viene una nueva linea se termina de reconocer el comentario.
             CommentTerminal commentMultilinea1 = new CommentTerminal("comentarioBloque", "(*", "*)");
-            CommentTerminal commentMultilinea2 = new CommentTerminal("comentarioBloque", "{*", "*}");
+            CommentTerminal commentMultilinea2 = new CommentTerminal("comentarioBloque", "{", "}");
             NumberLiteral entero = new NumberLiteral("entero");
             //RegexBasedTerminal real = new RegexBasedTerminal("real", "[0-9]+.[0-9]+");
             //RegexBasedTerminal ID = new RegexBasedTerminal("id", "[A-ZÑa-zñ][_0-9A-ZÑa-zñ]*");
@@ -137,6 +137,9 @@ namespace Compi2_Proyecto1.Analizador
             NonTerminal L_DECLARACIONES = new NonTerminal("L_DECLARACIONES");
             NonTerminal DECLARACION_ESPECIAL = new NonTerminal("DECLARACION_ESPECIAL");
             NonTerminal L_DECLARACIONES_ESPECIALES = new NonTerminal("L_DECLARACIONES_ESPECIALES");
+            NonTerminal CUERPO_PARAMETROS = new NonTerminal("CUERPO_PARAMETROS");
+            NonTerminal CUERPO_INTERNO = new NonTerminal("CUERPO_INTERNO");
+            NonTerminal LLAMADA_M = new NonTerminal("LLAMADA_M");
 
             NonTerminal L_INSTRUCCIONES_PRINCIPALES = new NonTerminal("L_INSTRUCCIONES_PRINCIPALES");
             NonTerminal INSTRUCCION_PRINCIPAL = new NonTerminal("INSTRUCCION_PRINCIPAL");
@@ -159,8 +162,16 @@ namespace Compi2_Proyecto1.Analizador
                 ;
 
             DECLARACION_MF.Rule =
-                 tfunction + ID + parIzquierdo + L_DECLARACIONES_ESPECIALES + parDerecho + dospuntos + TIPO + ptcoma + L_DECLARACIONES + BLOQUE
-                | tprocedure + ID + parIzquierdo + L_DECLARACIONES_ESPECIALES + parDerecho + ptcoma + L_DECLARACIONES + BLOQUE
+                 tfunction + ID + CUERPO_PARAMETROS + dospuntos + TIPO + CUERPO_INTERNO
+                | tprocedure + ID + CUERPO_PARAMETROS + CUERPO_INTERNO
+                ;
+
+            CUERPO_INTERNO.Rule = ptcoma + L_DECLARACIONES + BLOQUE
+                | ptcoma + BLOQUE
+                ;
+
+            CUERPO_PARAMETROS.Rule = parIzquierdo + L_DECLARACIONES_ESPECIALES + parDerecho
+                | parIzquierdo + parDerecho
                 ;
 
             L_DECLARACIONES_ESPECIALES.Rule = L_DECLARACIONES_ESPECIALES + ptcoma + DECLARACION_ESPECIAL
@@ -195,8 +206,14 @@ namespace Compi2_Proyecto1.Analizador
                 |SENT_SWITCH + ptcoma
                 |SENT_REPEAT_UNTIL + ptcoma
                 |SENT_FOR + ptcoma
+                |LLAMADA_M + ptcoma
                 ;
-                        
+
+            LLAMADA_M.Rule = L_IDS_Accesos + parIzquierdo + parDerecho
+                |L_IDS_Accesos + parIzquierdo + L_Expresiones + parDerecho
+                ;
+
+            INSTRUCCION.ErrorRule = SyntaxError + ptcoma;
 
             SENT_FOR.Rule = tfor + ASIGNACION + tto + E + tdo + BLOQUE
                 |tfor + ASIGNACION + tdownto + E + tdo + BLOQUE

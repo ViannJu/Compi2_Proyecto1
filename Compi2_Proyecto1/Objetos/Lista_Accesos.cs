@@ -10,6 +10,8 @@ namespace Compi2_Proyecto1.Objetos
     {
         public LinkedList<Id> accesos;
 
+        public Lista_Accesos() { }//para capturar tipo
+
         public Lista_Accesos(LinkedList<Id> accesos)
         {
             this.accesos = accesos;

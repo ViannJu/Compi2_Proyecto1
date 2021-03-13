@@ -11,7 +11,7 @@ namespace Compi2_Proyecto1.Analizador
         private string output = "";
         private string mensajes = "";
         public static LinkedList<TipoCiclo> Display = new LinkedList<TipoCiclo>();
-        //public static LinkedList<TipoMF> PilaMF = new LinkedList<>();
+        public static LinkedList<TipoMF> PilaMF = new LinkedList<TipoMF>();
         private LinkedList<Instruccion> instrucciones = new LinkedList<Instruccion>();
         private LinkedList<C_Error> listaErrores = new LinkedList<C_Error>();
         private static readonly MasterClass instance = new MasterClass();
@@ -36,6 +36,11 @@ namespace Compi2_Proyecto1.Analizador
         {
             //los tipos de primitivos
             Ciclo, Switch
+        }
+
+        public enum TipoMF
+        {
+            Metodo, Funcion, Metodo_Funcion
         }
 
 
@@ -85,7 +90,7 @@ namespace Compi2_Proyecto1.Analizador
         public void showAllErrors() {
             foreach (C_Error mistake in this.listaErrores) {
                 //Console.WriteLine(mistake.getDescripcionError());
-                this.addMessage(mistake.getDescripcionError(), true);
+                this.addMessage(mistake.getDescripcionError() +", Linea: "+ mistake.getlinea()+", Columna: "+mistake.getColumna(), true);
                 //MessageBox.Show(mistake.getDescripcionError());
             }
         }
@@ -103,6 +108,33 @@ namespace Compi2_Proyecto1.Analizador
         public int getCantidad()
         {
             return this.instrucciones.Count;
+        }
+
+        /*Para llevar el control de los break*/
+        public bool EstoyDentroDeCiclo(TipoCiclo tipoCiclo)
+        {
+            foreach (TipoCiclo recorrer in Display)
+            {
+                if (recorrer == tipoCiclo)
+                {
+
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool EstoyDentroDeMF(TipoMF tipoMF)
+        {
+            foreach (TipoMF recorrer in PilaMF)
+            {
+                if (recorrer == tipoMF)
+                {
+                    return true;
+                    //es recorrer
+                }
+            }
+            return false;
         }
 
         public void ejecutar()

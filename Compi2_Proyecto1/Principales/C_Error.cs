@@ -29,14 +29,14 @@ namespace Compi2_Proyecto1.Principales
             return descripcion;
         }
 
-        public int getlinea()
+        public string getlinea()
         {
-            return linea;
+            return linea.ToString();
         }
 
-        public int getColumna()
+        public string getColumna()
         {
-            return columna;
+            return columna.ToString();
         }
 
     }

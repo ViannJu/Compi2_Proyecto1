@@ -66,7 +66,7 @@ namespace Compi2_Proyecto1.Analizador
             }
         }
 
-        private void evaluarInstruccionPrincipal(ParseTreeNode nodo ) {
+        private void evaluarInstruccionPrincipal(ParseTreeNode nodo) {
 
             switch (nodo.ChildNodes[0].Term.Name) {
 
@@ -159,10 +159,247 @@ namespace Compi2_Proyecto1.Analizador
                     break;
 
                 case "DECLARACION_MF":
+
+                    //tfunction + ID + CUERPO_PARAMETROS + dospuntos + TIPO + CUERPO_INTERNO
+                    if (nodo.ChildNodes[0].ChildNodes.Count == 6) {
+
+                        //Mando a traer el ID
+                        String nombre = nodo.ChildNodes[0].ChildNodes[1].Token.ValueString;
+
+                        //Mando a traer el cuerpo de los parametros
+                        LinkedList<Instruccion> listaDeclaraciones = new LinkedList<Instruccion>();
+                        evaluarCuerpoParametros(nodo.ChildNodes[0].ChildNodes[2], listaDeclaraciones);
+
+                        //Mando a traer el tipo
+                        Tipo tipe = evaluarTipo(nodo.ChildNodes[0].ChildNodes[4]);
+
+                        //Mando a traer el cuerpo interno de la declaracionMF
+                        LinkedList<Instruccion> listaInstruccionesMF = new LinkedList<Instruccion>();
+                        evaluarL_InstruccionesMF(nodo.ChildNodes[0].ChildNodes[5], listaInstruccionesMF);
+
+                        Instruccion temp;
+                        if (listaDeclaraciones.Count == 0)
+                        {
+                            //no tiene parametros
+                            temp = new Declaracion_MF(nombre, tipe, listaInstruccionesMF, 0, 0);
+                        }
+                        else {
+                            temp = new Declaracion_MF(nombre, listaDeclaraciones, tipe, listaInstruccionesMF, 0, 0);
+                        }
+
+                        MasterClass.Instance.addInstruction(temp);
+
+                    }
+                    //tprocedure + ID + CUERPO_PARAMETROS + ptcoma + CUERPO_INTERNO
+                    else if (nodo.ChildNodes[0].ChildNodes.Count == 5) {
+
+                        //Mando a traer el ID
+                        String nombre = nodo.ChildNodes[0].ChildNodes[1].Token.ValueString;
+
+                        //Mando a traer el cuerpo de los parametros
+                        LinkedList<Instruccion> listaDeclaraciones = new LinkedList<Instruccion>();
+                        evaluarCuerpoParametros(nodo.ChildNodes[0].ChildNodes[2], listaDeclaraciones);
+
+                        //Mando a traer el tipo
+                        Tipo tipe = new Tipo(Tipo.enumTipo.Void);
+
+                        //Mando a traer el cuerpo interno de la declaracionMF
+                        LinkedList<Instruccion> listaInstruccionesMF = new LinkedList<Instruccion>();
+                        evaluarL_InstruccionesMF(nodo.ChildNodes[0].ChildNodes[5], listaInstruccionesMF);
+
+                        Instruccion temp;
+                        if (listaDeclaraciones.Count == 0)
+                        {
+                            //no tiene parametros
+                            temp = new Declaracion_MF(nombre, tipe, listaInstruccionesMF, 0, 0);
+                        }
+                        else
+                        {
+                            temp = new Declaracion_MF(nombre, listaDeclaraciones, tipe, listaInstruccionesMF, 0, 0);
+                        }
+
+                        MasterClass.Instance.addInstruction(temp);
+                    }
                     break;
 
             }
 
+        }
+
+        private void evaluarL_InstruccionesMF(ParseTreeNode nodo, LinkedList<Instruccion> listaInstruccionesMF) {
+
+            //ptcoma + L_DECLARACIONES + BLOQUE
+            if (nodo.ChildNodes.Count == 3) {
+
+                //Mando a traer la lista de declaraciones
+                LinkedList<Instruccion> listaDeclaraciones = new LinkedList<Instruccion>();
+                evaluarL_Declaraciones(nodo.ChildNodes[1], listaInstruccionesMF);
+
+                //Mando a traer el bloque
+                Bloque bloque = evaluarBloque(nodo.ChildNodes[2]);
+
+                //guardamos todo en la lista de instrucciones
+                foreach (Instruccion declaracion in listaDeclaraciones) {
+                    listaInstruccionesMF.AddLast(declaracion);
+                }
+
+                listaInstruccionesMF.AddLast(bloque);
+
+            }
+            //ptcoma + BLOQUE
+            else if (nodo.ChildNodes.Count == 2) {
+
+                //Mando a traer el bloque
+                Bloque bloque = evaluarBloque(nodo.ChildNodes[1]);
+
+                //guardamos el bloque en la lista
+                listaInstruccionesMF.AddLast(bloque);
+
+            }
+
+            
+        }
+
+        private void evaluarL_Declaraciones(ParseTreeNode nodo, LinkedList<Instruccion> listaDeclaraciones) {
+
+            //L_DECLARACIONES + DECLARACION + ptcoma
+            if (nodo.ChildNodes.Count == 3) {
+
+                evaluarL_Declaraciones(nodo.ChildNodes[0], listaDeclaraciones);
+                evaluarDeclaracion(nodo.ChildNodes[1], listaDeclaraciones);
+
+            }
+            //DECLARACION + ptcoma
+            else if (nodo.ChildNodes.Count == 2) {
+
+                evaluarDeclaracion(nodo.ChildNodes[0], listaDeclaraciones);
+            }
+
+            
+        }
+
+        private void evaluarDeclaracion(ParseTreeNode nodo, LinkedList<Instruccion> listaDeclaraciones) {
+
+            //tvar + L_IDS + dospuntos + TIPO   
+            if (nodo.ChildNodes[0].ChildNodes.Count == 4)
+            {
+                //tvar + L_IDS + dospuntos + TIPO
+                //Lista de declaraciones
+                LinkedList<string> listaIDS = new LinkedList<string>();
+
+                //tengo que mandar a traer la lista de ID's
+                evaluarL_IDS(nodo.ChildNodes[1], listaIDS);
+
+                //MasterClass.Instance.addMessage("La lista de ids tiene: " + listaIDS.Count, true);
+
+                //Tengo que mandar el tipo 
+                Tipo tipe = evaluarTipo(nodo.ChildNodes[3]);
+
+                Instruccion temp;
+                temp = new Declaracion(tipe, listaIDS, 0, 0);
+
+                //mandarle a declaracion -> se guarda en una lista de instrucciones
+                listaDeclaraciones.AddLast(temp);
+
+            }
+            //tvar + L_IDS + dospuntos + TIPO + igualdad + E
+            else if(nodo.ChildNodes[0].ChildNodes.Count == 6)
+            {
+                //Mando a traer al identificador en L_IDS.Count = 1
+                LinkedList<String> listaIDS = new LinkedList<string>();
+                evaluarL_IDS(nodo.ChildNodes[1], listaIDS);
+                String identificador = "";
+
+                if (listaIDS.Count == 1)
+                {
+
+                    identificador = listaIDS.First.Value;
+                }
+
+                //Tengo que mandar el tipo
+                Tipo tipe = evaluarTipo(nodo.ChildNodes[3]);
+
+                //Tengo que mandar la Expresion
+                Expresion expression = evaluarExpresion(nodo.ChildNodes[5]);
+
+                //Mandamos la declaracion
+                Instruccion temp;
+                temp = new Declaracion(tipe, identificador, expression, 0, 0);
+
+                //mandarle a declaracion -> se guarda en una lista de instrucciones 
+                listaDeclaraciones.AddLast(temp);
+
+
+            }
+        }
+
+        private void evaluarCuerpoParametros(ParseTreeNode nodo, LinkedList<Instruccion> listaDeclaracionesEspeciales) {
+
+            //parIzquierdo + L_DECLARACIONES_ESPECIALES + parDerecho
+            if (nodo.ChildNodes.Count == 3) {
+
+                //Mando a traer la lista de declaraciones especiales
+                evaluarL_DECLARACIONES_ESPECIALES(nodo.ChildNodes[1], listaDeclaracionesEspeciales);
+            }
+            //parIzquierdo + parDerecho
+            else if (nodo.ChildNodes.Count == 2) {
+
+                //retorno la lista de declaraciones especiales como null
+            }   
+        }
+
+        private void evaluarL_DECLARACIONES_ESPECIALES(ParseTreeNode nodo, LinkedList<Instruccion> listaDeclaracionesEspeciales) {
+
+            //L_DECLARACIONES_ESPECIALES + ptcoma + DECLARACION_ESPECIAL
+            if (nodo.ChildNodes.Count == 3) {
+
+                evaluarL_DECLARACIONES_ESPECIALES(nodo.ChildNodes[0], listaDeclaracionesEspeciales);
+                evaluarDeclaracionEspecial(nodo.ChildNodes[2], listaDeclaracionesEspeciales);
+            }
+            //DECLARACION_ESPECIAL
+            else if (nodo.ChildNodes.Count == 1) {
+
+                evaluarDeclaracionEspecial(nodo.ChildNodes[0], listaDeclaracionesEspeciales);
+            }
+            
+                
+        }
+
+        private void evaluarDeclaracionEspecial(ParseTreeNode nodo, LinkedList<Instruccion> listaDeclaraciones) {
+
+            //L_IDS + dospuntos + TIPO
+            if (nodo.ChildNodes.Count == 3) {
+
+                //Mando a traer la lista de IDS
+                LinkedList<String> listaIDS = new LinkedList<string>();
+                evaluarL_IDS(nodo.ChildNodes[0], listaIDS);
+
+                //Mando a traer el tipo
+                Tipo tipo = evaluarTipo(nodo.ChildNodes[2]);
+
+                //Guardamos en la lista de declaraciones
+                Instruccion temp;
+                temp = new Declaracion(tipo, listaIDS, 0, 0);
+                listaDeclaraciones.AddLast(temp);
+
+            }
+            //tvar + L_IDS + dospuntos + TIPO
+            else if (nodo.ChildNodes.Count == 4) {
+
+                //Mando a traer la lista de IDS
+                LinkedList<String> listaIDS = new LinkedList<string>();
+                evaluarL_IDS(nodo.ChildNodes[1], listaIDS);
+
+                //Mando a traer el tipo
+                Tipo tipo = evaluarTipo(nodo.ChildNodes[3]);
+
+                //Guardamos en la lista de declaraciones
+                Instruccion temp;
+                temp = new Declaracion(tipo, listaIDS, 0, 0);
+                listaDeclaraciones.AddLast(temp);
+
+            }
+            
         }
 
         private void evaluarL_Instrucciones(ParseTreeNode nodo, bool bloque, LinkedList<Instruccion> guardadosBloque)

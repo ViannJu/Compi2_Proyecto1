@@ -4,6 +4,7 @@ using System.Text;
 using Compi2_Proyecto1.Principales;
 using Compi2_Proyecto1.Analizador;
 using Compi2_Proyecto1.Objetos;
+using System.Windows.Forms;
 
 namespace Compi2_Proyecto1.Instrucciones
 {
@@ -106,12 +107,14 @@ namespace Compi2_Proyecto1.Instrucciones
             Variable p = new Variable(new Tipo(Tipo.enumTipo.Objecto), f);
 
             switch (tipo.tipo)
-            {
+            {                
                 case Tipo.enumTipo.Void:
                     ent.insertar(nuevoNombre, p, linea, columna, "El procedimiento");
+                    MessageBox.Show("Insertando procedimiento");
                     break;
                 default:
                     ent.insertar(nuevoNombre, p, linea, columna, "La funcion");
+                    MessageBox.Show("Insertando funcion");
                     break;
             }
 
