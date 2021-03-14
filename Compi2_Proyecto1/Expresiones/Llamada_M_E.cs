@@ -1,62 +1,37 @@
-﻿using System;
+﻿using Compi2_Proyecto1.Principales;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using Compi2_Proyecto1.Principales;
 using Compi2_Proyecto1.Analizador;
 using Compi2_Proyecto1.Objetos;
-using Compi2_Proyecto1.Expresiones;
+using Compi2_Proyecto1.Instrucciones;
 using System.Linq;
 
-namespace Compi2_Proyecto1.Instrucciones
+namespace Compi2_Proyecto1.Expresiones
 {
-    /*
-     * Clase para gestionar las llamadas a los procedimientos
-     */
-    public class Llamada_M : Instruccion
+    public class Llamada_M_E : Id
     {
-        String nombreFuncion;
         LinkedList<Expresion> enviados; //expresiones enviadas como parametros
-        Lista_Accesos id_;
 
-        //Constructor para cuando tenga parametros enviados
-        public Llamada_M(String nombreFuncion, LinkedList<Expresion> enviados, int linea, int columna)
+        public Llamada_M_E(string id, LinkedList<Expresion> enviados, int linea, int columna):base(id, linea, columna)
         {
-            this.linea = linea;
-            this.columna = columna;
-            this.nombreFuncion = nombreFuncion;
             this.enviados = enviados;
         }
 
-        //Constructor para cuando no reciba parametros enviados
-        public Llamada_M(String nombreFuncion, int linea, int columna)
+        public Llamada_M_E(string id, int linea, int columna) : base(id, linea, columna)
         {
-            this.linea = linea;
-            this.columna = columna;
-            this.nombreFuncion = nombreFuncion;
-            this.enviados = null;
+            this.enviados = new LinkedList<Expresion>();
         }
 
-        //Constructor para cuando tenga parametros enviados y sea Acceso
-        public Llamada_M(Lista_Accesos id_, LinkedList<Expresion> enviados, int linea, int columna)
+        public override string getDot()
         {
-            this.linea = linea;
-            this.columna = columna;
-            this.id_ = id_;
-            this.enviados = enviados;
-        }
-
-        //Constructor para cuando no reciba parametros enviados y sea acceso
-        public Llamada_M(Lista_Accesos id_, int linea, int columna)
-        {
-            this.linea = linea;
-            this.columna = columna;
-            this.id_ = id_;
-            this.enviados = null;
+            return base.getDot();
         }
 
 
-        public override object ejecutar(Entorno ent)
-        {   //ent en este caso es el main
+        public override Expresion getValor(Entorno ent)
+        {
+            //ent en este caso es el main
             LinkedList<Expresion> resueltos = new LinkedList<Expresion>();
 
             MasterClass.PilaMF.AddFirst(MasterClass.TipoMF.Metodo_Funcion);
@@ -65,32 +40,28 @@ namespace Compi2_Proyecto1.Instrucciones
             Entorno nuevo = new Entorno(ent); //El global es el del objeto
 
 
-            //crea un clon del acceso y no manda nada porque no hay lista de accesos
-            Lista_Accesos acceso = new Lista_Accesos();
-
-            foreach (Id myId in this.id_.accesos) {
-                acceso.accesos.AddLast(myId);
-            }
-
             //creamos un literal para poder regresar
-            Object retorno = null;
+            Expresion retorno = null;
 
             //Modificamos el nombre
             String aux = "";
-            String a2 = acceso.accesos.Last.Value.id;
-            String a3 = a2.Substring(0,1);
-            if (!a3.Equals("#")) {
+            String a2 = this.id;
+            String a3 = a2.Substring(0, 1);
+            if (!a3.Equals("#"))
+            {
                 aux = "#";
             }
 
 
 
-            String nombreFuncion2 = acceso.accesos.Last.Value.id + aux;
+            String nombreFuncion2 = this.id + aux;
             //ahora ejecutamos las expresiones -> parametros enviados si esque tiene
-            if (this.enviados != null) {
+            if (this.enviados != null)
+            {
                 //recorremos los parametros enviados
                 //Aqui se le puede enviar un id -> debemos ir a buscarlo
-                foreach (Expresion parametro in this.enviados) {
+                foreach (Expresion parametro in this.enviados)
+                {
 
                     var parametroType = parametro.GetType();
                     var listaAccesosType = new Lista_Accesos().GetType();
@@ -114,7 +85,8 @@ namespace Compi2_Proyecto1.Instrucciones
                         */
 
                     }
-                    else {
+                    else
+                    {
 
                         nombreFuncion2 += parametro.getValor(nuevo).tipo.tipo.ToString();
                         resueltos.AddLast(parametro.getValor(nuevo));
@@ -124,43 +96,31 @@ namespace Compi2_Proyecto1.Instrucciones
             }
 
             //adjuntar el último valor modificado para el método
-            if (!aux.Equals("", StringComparison.InvariantCultureIgnoreCase)) {
+            /*
+            if (!aux.Equals("", StringComparison.InvariantCultureIgnoreCase))
+            {
 
                 Id id = acceso.accesos.Last.Value;
                 acceso.accesos.RemoveLast();
                 acceso.accesos.AddLast(new Id(nombreFuncion2, id.linea, id.columna));
 
             }
-
-            //obtenemos el entorno global del objeto cuando realizamos la llamada
-            if (id_.accesos.Count > 1)
-            {
-
-                Entorno nuevo2 = ent.getEntornoAcceso(id_);
-                if (nuevo2 != null)
-                {
-                    nuevo.global = nuevo2;
-                }
-                else
-                {
-                    nuevo.global = ent.global;
-                }
-            }
-            else {
-                nuevo.global = ent.global;
-            }
+            */
 
             
+            nuevo.global = ent.global;
+
+
             Variable f;
             //luego buscamos la funcion
-            f = nuevo.buscar(acceso, linea, columna, "El procedimiento");
+            f = nuevo.buscar(nombreFuncion2, linea, columna, "La Funcion");
             //si lo encontro
             if (f != null)
             {
                 //aqui pedimos el tipo
                 //creamos una variable (exit) 
                 LinkedList<String> lista = new LinkedList<String>();
-                lista.AddLast(acceso.accesos.Last.Value.id);
+                lista.AddLast(id);
                 Declaracion nombreFuncionDec = new Declaracion(f.tipo, lista, 0, 0);
                 nombreFuncionDec.ejecutar(nuevo);
 
@@ -188,7 +148,8 @@ namespace Compi2_Proyecto1.Instrucciones
 
                         Tipo tipe = new Tipo(((Declaracion)declaracion).tipo.tipo);
 
-                        foreach (String identify in ((Declaracion)declaracion).IDS) {//Identificador a,b:integer m:integer
+                        foreach (String identify in ((Declaracion)declaracion).IDS)
+                        {//Identificador a,b:integer m:integer
 
                             if (((Declaracion)declaracion).PorReferencia)
                             {
@@ -212,7 +173,8 @@ namespace Compi2_Proyecto1.Instrucciones
                                                 //esperamos un objeto
                                             }
                                         }
-                                        else {
+                                        else
+                                        {
                                             //error no se encontro la variable
                                             return null;
                                         }
@@ -220,19 +182,22 @@ namespace Compi2_Proyecto1.Instrucciones
 
                                     }
 
-                                    if (tipe.tipo == sim.tipo.tipo && sim.tipo.referencia == tipe.referencia) {
+                                    if (tipe.tipo == sim.tipo.tipo && sim.tipo.referencia == tipe.referencia)
+                                    {
 
 
                                         nuevo.insertar(identify, sim, linea, columna, "La variable");
                                     }
 
                                 }
-                                else {
+                                else
+                                {
                                     //Se esperaba un valor por referencia
                                 }
 
                             }
-                            else {
+                            else
+                            {
 
                                 Declaracion temp = new Declaracion(tipe, identify, resueltos.ElementAt(iterador), 0, 0);
 
@@ -243,7 +208,7 @@ namespace Compi2_Proyecto1.Instrucciones
 
                             cont += 1;
                         }
-                        
+
 
                     }
 
@@ -253,9 +218,11 @@ namespace Compi2_Proyecto1.Instrucciones
                  * Ejecucion como tal de la lista de declaraciones y de la lista de instrucciones (bloque)
                  */
 
-                if (((Tipo_MF)f.valor).listaDeclaraciones != null) {
+                if (((Tipo_MF)f.valor).listaDeclaraciones != null)
+                {
 
-                    foreach (Instruccion declaration in ((Tipo_MF)f.valor).listaDeclaraciones) {
+                    foreach (Instruccion declaration in ((Tipo_MF)f.valor).listaDeclaraciones)
+                    {
 
                         declaration.ejecutar(nuevo);
                     }
@@ -267,16 +234,17 @@ namespace Compi2_Proyecto1.Instrucciones
 
                     foreach (Instruccion ins in ((Tipo_MF)f.valor).listaInstrucciones)
                     {
-                        retorno = ins.ejecutar(nuevo);
+                        retorno = (Expresion)ins.ejecutar(nuevo);
                     }
                 }
-                else {
+                else
+                {
 
                     //ejecutamos el bloque de instrucciones
-                    retorno = ((Tipo_MF)f.valor).getbloque().ejecutar(nuevo);
+                    retorno = (Expresion)((Tipo_MF)f.valor).getbloque().ejecutar(nuevo);
                 }
 
-                
+
 
                 //verificamos si enviaron un return
                 if (retorno != null)
@@ -284,11 +252,11 @@ namespace Compi2_Proyecto1.Instrucciones
 
                     Primitivo sim = (Primitivo)retorno;
                     //validamos el retorno dentro del metodo o funcion
-                    if (f.tipo.tipo == Tipo.enumTipo.Void)
+                    if (f.tipo.tipo == Tipo.enumTipo.Void && ((Expresion)retorno).tipo.tipo != Tipo.enumTipo.Void)  //viene exit vacio
                     {
                         //error, porque si retorna algo no debe ser null
-                        MasterClass.Instance.addError(new C_Error("Semantico", "No se esperaba retorno en metodo: " + nombreFuncion, linea, columna));
-                        retorno = null;
+                        MasterClass.Instance.addError(new C_Error("Semantico", "No se esperaba retorno en metodo: " + nombreFuncion2, linea, columna));
+                        retorno = new Primitivo(new Tipo(Tipo.enumTipo.error), "@error@");
                     }
                     else
                     {
@@ -298,26 +266,28 @@ namespace Compi2_Proyecto1.Instrucciones
                         {
                             //si no es el mismo entonces es un error
                             MasterClass.Instance.addError(new C_Error("Semantico", "El tipo de retorno y funcion no coinciden: " + sim.tipo.tipo + " = " + f.tipo.tipo, linea, columna));
-                            retorno = null;
+                            retorno = new Primitivo(new Tipo(Tipo.enumTipo.error), "@error@");
                         }
                     }
                 }
+                else {
+
+                    //buscamos la variable con el mismo de la funcion
+                    Variable nombreFuncionVar = nuevo.buscar(id, linea, columna, "La variable");
+                    retorno = new Primitivo(f.tipo, nombreFuncionVar.valor);
+
+                }
 
             }
-            else {
+            else
+            {
 
-                MasterClass.Instance.addError(new C_Error("Semantico", "El metodo " + nombreFuncion + " no existe en el contexto", linea, columna));
+                MasterClass.Instance.addError(new C_Error("Semantico", "El metodo " + nombreFuncion2 + " no existe en el contexto", linea, columna));
             }
 
             MasterClass.PilaMF.RemoveLast();
-            return null;
+            return retorno;
 
-
-        }
-
-        public override string stringDot()
-        {
-            throw new NotImplementedException();
         }
     }
 }

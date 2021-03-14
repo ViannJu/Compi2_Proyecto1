@@ -140,7 +140,7 @@ namespace Compi2_Proyecto1.Analizador
         public void ejecutar()
         {
             
-            general = new Entorno(null, general);
+            general = new Entorno(null, general, "General");
             general.global = general;
 
             foreach (Instruccion nodo in instrucciones)

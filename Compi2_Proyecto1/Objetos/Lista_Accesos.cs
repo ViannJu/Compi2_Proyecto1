@@ -8,7 +8,7 @@ namespace Compi2_Proyecto1.Objetos
 {
     public class Lista_Accesos : Expresion
     {
-        public LinkedList<Id> accesos;
+        public LinkedList<Id> accesos = new LinkedList<Id>();
 
         public Lista_Accesos() { }//para capturar tipo
 
@@ -31,7 +31,7 @@ namespace Compi2_Proyecto1.Objetos
             foreach (Id id in accesos)
             {
                 //buscamos el objeto en el entorno que viene
-                Variable sim = id.getSimbolo(entBuscar);
+                Expresion sim = id.getValor(entBuscar);
 
                 //vamos preguntando si es el ultimo
                 if (id == accesos.Last.Value)

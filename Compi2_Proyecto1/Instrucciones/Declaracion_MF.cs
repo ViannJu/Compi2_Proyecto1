@@ -62,8 +62,11 @@ namespace Compi2_Proyecto1.Instrucciones
             this.listaInstruccionesMF = listaInstruccionesMF;
         }
 
+        
         public override object ejecutar(Entorno ent)
         {
+            String nombreEntorno = ent.nombreEntorno;
+
             //creamos una nueva variable
             Tipo_MF f = new Tipo_MF(tipo, this.nombre);
 
@@ -79,14 +82,16 @@ namespace Compi2_Proyecto1.Instrucciones
                 //recorremos las declaraciones (parametros) 
                 foreach (Instruccion parametro in this.listaDeclaraciones)
                 {
-
                     var declaracionType = new Declaracion().GetType();
                     var parametroType = parametro.GetType();
 
                     //verificamos si es una declaracion para guardarlo en el nombre
                     if (parametroType == declaracionType)
                     {
-                        nuevoNombre += ((Declaracion)parametro).tipo.tipo;
+                        foreach (String nombreParametro in ((Declaracion)parametro).IDS) {
+
+                            nuevoNombre += ((Declaracion)parametro).tipo.tipo;  //si vienen dos IDS en lista, seguiran siendo del mismo tipo
+                        }                        
                     }
                     else
                     {
@@ -104,17 +109,17 @@ namespace Compi2_Proyecto1.Instrucciones
                 f.setTipo(this.listaInstruccionesMF);
             }
 
-            Variable p = new Variable(new Tipo(Tipo.enumTipo.Objecto), f);
+            Variable p = new Variable(tipo, f);
 
             switch (tipo.tipo)
             {                
                 case Tipo.enumTipo.Void:
                     ent.insertar(nuevoNombre, p, linea, columna, "El procedimiento");
-                    MessageBox.Show("Insertando procedimiento");
+                    //MessageBox.Show("Insertando procedimiento");
                     break;
                 default:
                     ent.insertar(nuevoNombre, p, linea, columna, "La funcion");
-                    MessageBox.Show("Insertando funcion");
+                    //MessageBox.Show("Insertando funcion");
                     break;
             }
 

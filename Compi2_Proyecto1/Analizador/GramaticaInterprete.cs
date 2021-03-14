@@ -140,6 +140,7 @@ namespace Compi2_Proyecto1.Analizador
             NonTerminal CUERPO_PARAMETROS = new NonTerminal("CUERPO_PARAMETROS");
             NonTerminal CUERPO_INTERNO = new NonTerminal("CUERPO_INTERNO");
             NonTerminal LLAMADA_M = new NonTerminal("LLAMADA_M");
+            NonTerminal OTRO_ID = new NonTerminal("OTRO_ID");
 
             NonTerminal L_INSTRUCCIONES_PRINCIPALES = new NonTerminal("L_INSTRUCCIONES_PRINCIPALES");
             NonTerminal INSTRUCCION_PRINCIPAL = new NonTerminal("INSTRUCCION_PRINCIPAL");
@@ -286,8 +287,15 @@ namespace Compi2_Proyecto1.Analizador
                 |E
                 ;
 
-            L_IDS_Accesos.Rule = L_IDS_Accesos + punto + ID
-                |ID;
+            L_IDS_Accesos.Rule = L_IDS_Accesos + punto + OTRO_ID
+                |OTRO_ID
+                ;
+
+            OTRO_ID.Rule = ID + parIzquierdo + parDerecho
+                | ID + parIzquierdo + L_Expresiones + parDerecho
+                | ID
+                //|ID + corAbierto + corCerrado
+                ;
 
             L_IDS.Rule = L_IDS + coma + ID
                 |ID

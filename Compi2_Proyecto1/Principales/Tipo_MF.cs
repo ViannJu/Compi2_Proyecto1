@@ -9,9 +9,10 @@ namespace Compi2_Proyecto1.Principales
     public class Tipo_MF : Variable
     {
 
-        LinkedList<Instruccion> parametros;
-        LinkedList<Instruccion> listaInstrucciones;
-        Bloque bloque;
+        public LinkedList<Instruccion> parametros;
+        public LinkedList<Instruccion> listaDeclaraciones;
+        public LinkedList<Instruccion> listaInstrucciones;
+        public Bloque bloque;
 
         public Tipo_MF(Tipo tipo, Object valor) : base(tipo, valor)
         {
@@ -20,15 +21,23 @@ namespace Compi2_Proyecto1.Principales
 
         public void setTipo(LinkedList<Instruccion> parametros, Bloque bloque)
         {
-
+            this.listaInstrucciones = null;
             this.parametros = parametros;
             this.bloque = bloque;
         }
 
         public void setTipo(LinkedList<Instruccion> parametros, LinkedList<Instruccion> listaInstrucciones)
         {
-
+            this.bloque = null;
             this.parametros = parametros;
+            this.listaInstrucciones = listaInstrucciones;
+        }
+
+        public void setTipo(LinkedList<Instruccion> parametros, LinkedList<Instruccion> listaDeclaraciones, LinkedList<Instruccion> listaInstrucciones)
+        {
+            this.bloque = null;
+            this.parametros = parametros;
+            this.listaDeclaraciones = listaDeclaraciones;
             this.listaInstrucciones = listaInstrucciones;
         }
 

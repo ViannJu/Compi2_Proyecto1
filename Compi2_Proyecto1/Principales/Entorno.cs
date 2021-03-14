@@ -15,15 +15,33 @@ namespace Compi2_Proyecto1.Principales
     {
         public Entorno global;
         public Entorno anterior;
+        public String nombreEntorno;
         public Dictionary<string, Variable> tabla;
 
-        public Entorno(Entorno anterior) {
+        public Entorno(Entorno anterior)
+        {
+            this.nombreEntorno = "";
             this.anterior = anterior;
             this.tabla = new Dictionary<string, Variable>();
         }
 
         public Entorno(Entorno anterior, Entorno global)
         {
+            this.nombreEntorno = "";
+            this.anterior = anterior;
+            this.global = global;
+            this.tabla = new Dictionary<string, Variable>();
+        }
+
+        public Entorno(Entorno anterior, String nombreEntorno) {
+            this.nombreEntorno = nombreEntorno;
+            this.anterior = anterior;
+            this.tabla = new Dictionary<string, Variable>();
+        }
+
+        public Entorno(Entorno anterior, Entorno global, String nombreEntorno)
+        {
+            this.nombreEntorno = nombreEntorno;
             this.anterior = anterior;
             this.global = global;
             this.tabla = new Dictionary<string, Variable>();

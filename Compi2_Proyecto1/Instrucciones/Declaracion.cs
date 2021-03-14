@@ -8,6 +8,7 @@ namespace Compi2_Proyecto1.Instrucciones
 {
     public class Declaracion : Instruccion
     {
+        public bool PorReferencia = false;
         public Tipo tipo;
         string id;
         public LinkedList<string> IDS;
@@ -16,6 +17,7 @@ namespace Compi2_Proyecto1.Instrucciones
         public Declaracion() { }    //Solamente para capturar el tipo
         public Declaracion(Tipo tipo, String id, Expresion valor, int linea, int columna)
         {
+            this.PorReferencia = false;
             this.tipo = tipo;
             this.id = id;
             this.valor = valor;
@@ -25,6 +27,18 @@ namespace Compi2_Proyecto1.Instrucciones
 
         public Declaracion(Tipo tipo, LinkedList<string> IDS, int linea, int columna)
         {
+            this.PorReferencia = false;
+            this.tipo = tipo;
+            this.IDS = IDS;
+            this.valor = null;
+            this.linea = linea;
+            this.columna = columna;
+        }
+
+        /*Para varables por referencia en los parametros de una funcion o procedimiento*/
+        public Declaracion(Tipo tipo, LinkedList<string> IDS, bool PorReferencia, int linea, int columna)
+        {
+            this.PorReferencia = PorReferencia;
             this.tipo = tipo;
             this.IDS = IDS;
             this.valor = null;
@@ -82,70 +96,79 @@ namespace Compi2_Proyecto1.Instrucciones
             //Declaracion sin valor (puede ser una lista o un solo ID) se le asigna un valor por defecto
             else
             {
-                
-                //todas las variables seran de un solo tipo, lo recojemos
+                if (this.PorReferencia) {
+                    
+                    //entonces buscamos el simbolo de la variable que nos enviaron
 
-                switch (tipo.tipo) {
 
-                    case Tipo.enumTipo.entero:
-
-                        //Para cada variable de la lista
-                        foreach (string idVariable in this.IDS)
-                        {
-                            //La guardamos en el entorno con el valor por defecto
-                            ent.insertar(idVariable, new Variable(this.tipo, 0), linea, columna, "La variable");
-                        }
-
-                        break;
-
-                    case Tipo.enumTipo.cadena:
-
-                        //Para cada variable de la lista
-                        foreach (string idVariable in this.IDS)
-                        {
-                            //La guardamos en el entorno con el valor por defecto
-                            ent.insertar(idVariable, new Variable(this.tipo, ' '), linea, columna, "La variable");
-                        }
-
-                        break;
-
-                    case Tipo.enumTipo.booleano:
-
-                        //Para cada variable de la lista
-                        foreach (string idVariable in this.IDS)
-                        {
-                            //La guardamos en el entorno con el valor por defecto
-                            ent.insertar(idVariable, new Variable(this.tipo, false), linea, columna, "La variable");
-                        }
-
-                        break;
-
-                    case Tipo.enumTipo.real:
-
-                        //Para cada variable de la lista
-                        foreach (string idVariable in this.IDS)
-                        {
-                            //La guardamos en el entorno con el valor por defecto
-                            ent.insertar(idVariable, new Variable(this.tipo, 0.0), linea, columna, "La variable");
-                        }
-
-                        break;
-
-                    case Tipo.enumTipo.Objecto:
-
-                        //Para cada variable de la lista
-                        foreach (string idVariable in this.IDS)
-                        {
-                            //La guardamos en el entorno con el valor por defecto
-                            ent.insertar(idVariable, new Variable(this.tipo, null), linea, columna, "La variable");
-                        }
-
-                        break;
                 }
+                //De lo contrario es asignacion normal
+                else {
 
-                
+
+                    //todas las variables seran de un solo tipo, lo recojemos
+
+                    switch (tipo.tipo)
+                    {
+
+                        case Tipo.enumTipo.entero:
+
+                            //Para cada variable de la lista
+                            foreach (string idVariable in this.IDS)
+                            {
+                                //La guardamos en el entorno con el valor por defecto
+                                ent.insertar(idVariable, new Variable(this.tipo, 0), linea, columna, "La variable");
+                            }
+
+                            break;
+
+                        case Tipo.enumTipo.cadena:
+
+                            //Para cada variable de la lista
+                            foreach (string idVariable in this.IDS)
+                            {
+                                //La guardamos en el entorno con el valor por defecto
+                                ent.insertar(idVariable, new Variable(this.tipo, ' '), linea, columna, "La variable");
+                            }
+
+                            break;
+
+                        case Tipo.enumTipo.booleano:
+
+                            //Para cada variable de la lista
+                            foreach (string idVariable in this.IDS)
+                            {
+                                //La guardamos en el entorno con el valor por defecto
+                                ent.insertar(idVariable, new Variable(this.tipo, false), linea, columna, "La variable");
+                            }
+
+                            break;
+
+                        case Tipo.enumTipo.real:
+
+                            //Para cada variable de la lista
+                            foreach (string idVariable in this.IDS)
+                            {
+                                //La guardamos en el entorno con el valor por defecto
+                                ent.insertar(idVariable, new Variable(this.tipo, 0.0), linea, columna, "La variable");
+                            }
+
+                            break;
+
+                        case Tipo.enumTipo.Objecto:
+
+                            //Para cada variable de la lista
+                            foreach (string idVariable in this.IDS)
+                            {
+                                //La guardamos en el entorno con el valor por defecto
+                                ent.insertar(idVariable, new Variable(this.tipo, null), linea, columna, "La variable");
+                            }
+
+                            break;
+                    }
 
 
+                }
 
             }
 

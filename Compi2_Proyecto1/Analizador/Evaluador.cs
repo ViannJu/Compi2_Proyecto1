@@ -190,8 +190,8 @@ namespace Compi2_Proyecto1.Analizador
                         MasterClass.Instance.addInstruction(temp);
 
                     }
-                    //tprocedure + ID + CUERPO_PARAMETROS + ptcoma + CUERPO_INTERNO
-                    else if (nodo.ChildNodes[0].ChildNodes.Count == 5) {
+                    //tprocedure + ID + CUERPO_PARAMETROS + CUERPO_INTERNO
+                    else if (nodo.ChildNodes[0].ChildNodes.Count == 4) {
 
                         //Mando a traer el ID
                         String nombre = nodo.ChildNodes[0].ChildNodes[1].Token.ValueString;
@@ -205,7 +205,7 @@ namespace Compi2_Proyecto1.Analizador
 
                         //Mando a traer el cuerpo interno de la declaracionMF
                         LinkedList<Instruccion> listaInstruccionesMF = new LinkedList<Instruccion>();
-                        evaluarL_InstruccionesMF(nodo.ChildNodes[0].ChildNodes[5], listaInstruccionesMF);
+                        evaluarL_InstruccionesMF(nodo.ChildNodes[0].ChildNodes[3], listaInstruccionesMF);
 
                         Instruccion temp;
                         if (listaDeclaraciones.Count == 0)
@@ -281,7 +281,7 @@ namespace Compi2_Proyecto1.Analizador
         private void evaluarDeclaracion(ParseTreeNode nodo, LinkedList<Instruccion> listaDeclaraciones) {
 
             //tvar + L_IDS + dospuntos + TIPO   
-            if (nodo.ChildNodes[0].ChildNodes.Count == 4)
+            if (nodo.ChildNodes.Count == 4)
             {
                 //tvar + L_IDS + dospuntos + TIPO
                 //Lista de declaraciones
@@ -303,7 +303,7 @@ namespace Compi2_Proyecto1.Analizador
 
             }
             //tvar + L_IDS + dospuntos + TIPO + igualdad + E
-            else if(nodo.ChildNodes[0].ChildNodes.Count == 6)
+            else if(nodo.ChildNodes.Count == 6)
             {
                 //Mando a traer al identificador en L_IDS.Count = 1
                 LinkedList<String> listaIDS = new LinkedList<string>();
@@ -344,7 +344,7 @@ namespace Compi2_Proyecto1.Analizador
             //parIzquierdo + parDerecho
             else if (nodo.ChildNodes.Count == 2) {
 
-                //retorno la lista de declaraciones especiales como null
+                //retorno la lista de declaraciones especiales asi como viene
             }   
         }
 
@@ -371,7 +371,7 @@ namespace Compi2_Proyecto1.Analizador
             if (nodo.ChildNodes.Count == 3) {
 
                 //Mando a traer la lista de IDS
-                LinkedList<String> listaIDS = new LinkedList<string>();
+                LinkedList<string> listaIDS = new LinkedList<string>();
                 evaluarL_IDS(nodo.ChildNodes[0], listaIDS);
 
                 //Mando a traer el tipo
@@ -393,9 +393,11 @@ namespace Compi2_Proyecto1.Analizador
                 //Mando a traer el tipo
                 Tipo tipo = evaluarTipo(nodo.ChildNodes[3]);
 
+                bool VariablePorReferencia = true;
+
                 //Guardamos en la lista de declaraciones
                 Instruccion temp;
-                temp = new Declaracion(tipo, listaIDS, 0, 0);
+                temp = new Declaracion(tipo, listaIDS, VariablePorReferencia, 0, 0);
                 listaDeclaraciones.AddLast(temp);
 
             }
@@ -425,6 +427,66 @@ namespace Compi2_Proyecto1.Analizador
 
             //Como se llama la instruccion que viene
             switch (nodo.ChildNodes[0].Term.Name) {
+
+                case "LLAMADA_M":
+                    //L_IDS_Accesos + parIzquierdo + parDerecho
+                    if (nodo.ChildNodes[0].ChildNodes.Count == 3)
+                    {
+                        //Mando a traer la lista de accesos
+                        LinkedList<Id> listaAccesos = new LinkedList<Id>();
+                        evaluarL_IDS_Accesos(nodo.ChildNodes[0].ChildNodes[0], listaAccesos);
+
+                        //creamos la instruccion y la insertamos
+                        Lista_Accesos milistaAccesos = new Lista_Accesos(listaAccesos);
+                        Instruccion temp;
+                        temp = new Llamada_M(milistaAccesos, 0,0);
+
+                        //Si es un bloque se guarda en la lista de instrucciones de bloque
+                        if (bloque)
+                        {
+                            guardadosInstruccion.AddLast(temp);
+                        }
+                        //Si no es un bloque es la lista general de instrucciones de MasterClass
+                        else
+                        {
+                            //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                            MasterClass.Instance.addInstruction(temp);
+                            //MessageBox.Show("guarde el bloque en la masterclass");
+                        }
+
+                    }
+                    //L_IDS_Accesos + parIzquierdo + L_Expresiones + parDerecho
+                    else if(nodo.ChildNodes[0].ChildNodes.Count == 4)
+                    {
+                        //Mando a traer la lista de accesos
+                        LinkedList<Id> listaAccesos = new LinkedList<Id>();
+                        evaluarL_IDS_Accesos(nodo.ChildNodes[0].ChildNodes[0], listaAccesos);
+                        Lista_Accesos milistaAccesos = new Lista_Accesos(listaAccesos);
+
+                        //Mando a traer la lista de expresiones
+                        LinkedList<Expresion> listaExpresiones = new LinkedList<Expresion>();
+                        evaluarL_Expresiones(nodo.ChildNodes[0].ChildNodes[2], listaExpresiones);
+
+                        //creamos el objeto instruccion
+                        Instruccion temp;
+                        temp = new Llamada_M(milistaAccesos, listaExpresiones, 0, 0);
+
+                        //Si es un bloque se guarda en la lista de instrucciones de bloque
+                        if (bloque)
+                        {
+                            guardadosInstruccion.AddLast(temp);
+                        }
+                        //Si no es un bloque es la lista general de instrucciones de MasterClass
+                        else
+                        {
+                            //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                            MasterClass.Instance.addInstruction(temp);
+                            //MessageBox.Show("guarde el bloque en la masterclass");
+                        }
+                    }                    
+                    break;
+
+
 
                 //tfor + ASIGNACION + tto + E + tdo + BLOQUE;
                 case "SENT_FOR":
@@ -1021,23 +1083,57 @@ namespace Compi2_Proyecto1.Analizador
 
             if (nodo.ChildNodes.Count == 3)
             {
-                Id IDobjeto;
-                //L_IDS = L_IDS + punto + ID
+                //L_IDS = L_IDS + punto + OTRO_ID
                 evaluarL_IDS_Accesos(nodo.ChildNodes[0], lista);
+
+                lista.AddLast(evaluarOTRO_ID(nodo.ChildNodes[2]));
+
                 //el siguiente nodo es un valor primitivo entonces guardamos en la lista
-                IDobjeto = evaluarID_Acceso(nodo.ChildNodes[2]);
-                lista.AddLast(IDobjeto);
+                //IDobjeto = evaluarID_Acceso(nodo.ChildNodes[2]);
+                //lista.AddLast(IDobjeto);
             }
+            //OTRO_ID
             else
             {
-                Id IDobjeto;
+                lista.AddLast(evaluarOTRO_ID(nodo.ChildNodes[0]));
+                //Id IDobjeto;
                 //L_IDS = ID //El siguiente nodo es un valor primitivo entonces guardamos en la lista
-                IDobjeto = evaluarID_Acceso(nodo.ChildNodes[0]);
-                lista.AddLast(IDobjeto);
+                //IDobjeto = evaluarID_Acceso(nodo.ChildNodes[0]);
+                //lista.AddLast(IDobjeto);
             }
 
             return lista;
 
+        }
+
+        private Id evaluarOTRO_ID(ParseTreeNode nodo) {
+
+            //ID + parIzquierdo + parDerecho
+            if (nodo.ChildNodes.Count == 3)
+            {
+                //capturo el nombre porque es una funcion
+                String nombreFuncion = nodo.ChildNodes[0].Token.ValueString;
+                return new Llamada_M_E(nombreFuncion, 0, 0);
+            }
+            //ID + parIzquierdo + L_Expresiones + parDerecho
+            else if (nodo.ChildNodes.Count == 4)
+            {
+                //capturo el nombre
+                String nombreFuncion = nodo.ChildNodes[0].Token.ValueString;
+
+                //evaluar la lista de expresiones
+                LinkedList<Expresion> listaExpresiones = new LinkedList<Expresion>();
+                evaluarL_Expresiones(nodo.ChildNodes[2], listaExpresiones);
+
+                return new Llamada_M_E(nombreFuncion, listaExpresiones, 0, 0);
+            }
+            //ID
+            else /*if (nodo.ChildNodes.Count == 1)*/
+            {
+                return new Id(nodo.ChildNodes[0].Token.ValueString,0,0);
+            }
+            
+            
         }
 
         private Id evaluarID_Acceso(ParseTreeNode nodo)
