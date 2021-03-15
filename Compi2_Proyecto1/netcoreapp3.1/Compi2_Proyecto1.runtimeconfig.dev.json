@@ -1,0 +1,8 @@
+{
+  "runtimeOptions": {
+    "additionalProbingPaths": [
+      "C:\\Users\\dventura\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\dventura\\.nuget\\packages"
+    ]
+  }
+}

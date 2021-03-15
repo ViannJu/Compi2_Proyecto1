@@ -10,7 +10,7 @@ namespace Compi2_Proyecto1.Principales
      */
     public class Variable
     {
-
+        public bool Constante = false;
         public Tipo tipo;
         public Object valor;
         public int linea;
@@ -27,6 +27,13 @@ namespace Compi2_Proyecto1.Principales
 
         public Variable(Tipo tipo, Object valor, int linea, int columna)
         {
+            this.tipo = tipo;
+            this.valor = valor;
+        }
+
+        public Variable(Tipo tipo, Object valor, int linea, int columna, bool Constante)
+        {
+            this.Constante = Constante;
             this.tipo = tipo;
             this.valor = valor;
         }

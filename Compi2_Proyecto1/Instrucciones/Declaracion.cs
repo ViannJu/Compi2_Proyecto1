@@ -9,6 +9,7 @@ namespace Compi2_Proyecto1.Instrucciones
     public class Declaracion : Instruccion
     {
         public bool PorReferencia = false;
+        public bool EsConstante = false;
         public Tipo tipo;
         string id;
         public LinkedList<string> IDS;
@@ -18,6 +19,19 @@ namespace Compi2_Proyecto1.Instrucciones
         public Declaracion(Tipo tipo, String id, Expresion valor, int linea, int columna)
         {
             this.PorReferencia = false;
+            this.EsConstante = false;
+            this.tipo = tipo;
+            this.id = id;
+            this.valor = valor;
+            this.linea = linea;
+            this.columna = columna;
+        }
+
+        public Declaracion(Tipo tipo, String id, Expresion valor, int linea, int columna, bool EsConstante)
+        {
+            this.EsConstante = EsConstante;
+            this.PorReferencia = false;
+            this.EsConstante = false;
             this.tipo = tipo;
             this.id = id;
             this.valor = valor;
@@ -28,6 +42,7 @@ namespace Compi2_Proyecto1.Instrucciones
         public Declaracion(Tipo tipo, LinkedList<string> IDS, int linea, int columna)
         {
             this.PorReferencia = false;
+            this.EsConstante = false;
             this.tipo = tipo;
             this.IDS = IDS;
             this.valor = null;
@@ -39,6 +54,7 @@ namespace Compi2_Proyecto1.Instrucciones
         public Declaracion(Tipo tipo, LinkedList<string> IDS, bool PorReferencia, int linea, int columna)
         {
             this.PorReferencia = PorReferencia;
+            this.EsConstante = false;
             this.tipo = tipo;
             this.IDS = IDS;
             this.valor = null;
@@ -50,7 +66,7 @@ namespace Compi2_Proyecto1.Instrucciones
 
         public override Object ejecutar(Entorno ent)
         {
-            //MessageBox.Show("Entre al ejecutar de la clase Declaracion");
+            MessageBox.Show("Entre al ejecutar de la clase Declaracion");
             //si se le asigno un valor a la variable    ASIGNACION/DECLARACION
             if (this.valor != null)
             {

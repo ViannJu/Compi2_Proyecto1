@@ -96,6 +96,7 @@ namespace Compi2_Proyecto1.Analizador
             var texit = ToTerm("exit");
 
             var tgraficar_ts = ToTerm("graficar_ts");
+            var tconst = ToTerm("const");
 
             #endregion
 
@@ -156,6 +157,7 @@ namespace Compi2_Proyecto1.Analizador
             NonTerminal INSTRUCCION_PRINCIPAL = new NonTerminal("INSTRUCCION_PRINCIPAL");
 
             NonTerminal GRAFICAR_ENTS = new NonTerminal("GRAFICAR_ENTS");
+            NonTerminal CONSTANTES = new NonTerminal("CONSTANTES");
 
             #endregion
 
@@ -170,10 +172,13 @@ namespace Compi2_Proyecto1.Analizador
 
             INSTRUCCION_PRINCIPAL.Rule =
                  DECLARACION + ptcoma
+                | CONSTANTES + ptcoma
                 | DECLARACION_MF + ptcoma
                 | BLOQUE + punto    //El unico bloque independiente es el *Main*
                 | GRAFICAR_ENTS + ptcoma
                 ;
+
+            CONSTANTES.Rule = tconst + ID +  dospuntos + TIPO +  igualdad + E;
 
             DECLARACION_MF.Rule =
                  tfunction + ID + CUERPO_PARAMETROS + dospuntos + TIPO + CUERPO_INTERNO

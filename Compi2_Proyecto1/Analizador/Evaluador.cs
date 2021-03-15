@@ -17,6 +17,8 @@ namespace Compi2_Proyecto1.Analizador
 {
     public class Evaluador
     {
+        public String acumuladorCorrelativo = "N";
+        public int correlativo = 65;
 
         public Evaluador() { }
 
@@ -47,6 +49,10 @@ namespace Compi2_Proyecto1.Analizador
             {
                 MasterClass.Instance.addMessage("/****    Entrada correcta    ****/", true);
                 evaluarL_Instrucciones_Principales(raiz.ChildNodes[3]);
+
+                //termino de analizar
+                var contenido = Graficar(raiz);
+                MasterClass.contenidoDot = "digraph G {\n" + contenido.Nodos + contenido.Apuntadores + "\n}";
             }
 
         }
@@ -69,6 +75,24 @@ namespace Compi2_Proyecto1.Analizador
         private void evaluarInstruccionPrincipal(ParseTreeNode nodo) {
 
             switch (nodo.ChildNodes[0].Term.Name) {
+
+                case "CONSTANTES":
+                    //tconst + ID +  dospuntos + TIPO +  igualdad + E;
+
+                    //Mando a traer el ID
+                    String idConst = nodo.ChildNodes[0].ChildNodes[1].Token.ValueString;
+
+                    //Mando a traer el tipo
+                    Tipo tipeConst = evaluarTipo(nodo.ChildNodes[0].ChildNodes[3]);
+
+                    //Mando a traer la expresion
+                    Expresion expConst = evaluarExpresion(nodo.ChildNodes[0].ChildNodes[5]);
+
+                    //Mandamos la declaracion con bandera de constante
+                    Instruccion tempConst;
+                    tempConst = new Declaracion(tipeConst, idConst, expConst, 0, 0, true);
+                    MasterClass.Instance.addInstruction(tempConst);
+                    break;
 
                 case "GRAFICAR_ENTS":
                     //tgraficar_ts + parIzquierdo + parDerecho  <-- Mandamos a llamar a la clase graficar Entornos;
@@ -436,6 +460,37 @@ namespace Compi2_Proyecto1.Analizador
 
             //Como se llama la instruccion que viene
             switch (nodo.ChildNodes[0].Term.Name) {
+
+                case "CONSTANTES":
+                    //tconst + ID +  dospuntos + TIPO +  igualdad + E;
+
+                    //Mando a traer el ID
+                    String idConst = nodo.ChildNodes[0].ChildNodes[1].Token.ValueString;
+
+                    //Mando a traer el tipo
+                    Tipo tipeConst = evaluarTipo(nodo.ChildNodes[0].ChildNodes[3]);
+
+                    //Mando a traer la expresion
+                    Expresion expConst = evaluarExpresion(nodo.ChildNodes[0].ChildNodes[5]);
+
+                    //Mandamos la declaracion con bandera de constante
+                    Instruccion tempConst;
+                    tempConst = new Declaracion(tipeConst, idConst, expConst, 0, 0, true);
+
+                    //Guardamos la declaracion
+                    //Si es un bloque se guarda en la lista de instrucciones de bloque
+                    if (bloque)
+                    {
+                        guardadosInstruccion.AddLast(tempConst);
+                    }
+                    //Si no es un bloque es la lista general de instrucciones de MasterClass
+                    else
+                    {
+                        //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                        MasterClass.Instance.addInstruction(tempConst);
+                        //MessageBox.Show("guarde el bloque en la masterclass");
+                    }
+                    break;
 
                 case "GRAFICAR_ENTS":
                     //tgraficar_ts + parIzquierdo + parDerecho  <-- Mandamos a llamar a la clase graficar Entornos;
@@ -1245,7 +1300,59 @@ namespace Compi2_Proyecto1.Analizador
 
 
 
+        public  Retorno Graficar(ParseTreeNode actual)
+        {
+            if (actual != null)
+            {
+                Retorno retornoPadre = new Retorno();
+                Retorno retornoHijo = new Retorno();
+
+                retornoPadre.Nodos = acumuladorCorrelativo + (char)correlativo + "[label=\"" + actual.ToString() + "\"]\n";
+                string Padre = acumuladorCorrelativo + (char)correlativo;
+                foreach (ParseTreeNode Pt in actual.ChildNodes)
+                {
+                    if (correlativo + 1 > 90)
+                    {
+                        acumuladorCorrelativo += "_";
+                        correlativo = 65;
+                    }
+                    else
+                    {
+                        correlativo++;
+                    }
+                    retornoPadre.Apuntadores += Padre + " -> " + acumuladorCorrelativo + (char)correlativo + "\n";
+                    Retorno temp = Graficar(Pt);
+                    retornoHijo.Nodos += temp.Nodos;
+                    retornoHijo.Apuntadores += temp.Apuntadores;
+                }
+                return new Retorno(retornoPadre.Nodos + retornoHijo.Nodos,
+                    retornoPadre.Apuntadores + retornoHijo.Apuntadores);
+            }
+            return new Retorno();
+        }
+
 
 
     }
+
+
+    public  class Retorno
+    {
+        public string Nodos;
+        public string Apuntadores;
+        public Retorno()
+        {
+            Nodos = "";
+            Apuntadores = "";
+        }
+        public Retorno(string Nodos, string Apuntadores)
+        {
+            this.Nodos = Nodos;
+            this.Apuntadores = Apuntadores;
+        }
+    }
+
+
+
+
 }
