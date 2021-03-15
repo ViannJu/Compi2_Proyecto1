@@ -13,12 +13,19 @@ namespace Compi2_Proyecto1.Principales
 
         public Tipo tipo;
         public Object valor;
-
+        public int linea;
+        public int columna;
         /**
          * @param tipo Tipo del símbolo, el enum Tipo está en la clase Tipo
          * @param valor Valor del símbolo
          */
         public Variable(Tipo tipo, Object valor)
+        {
+            this.tipo = tipo;
+            this.valor = valor;
+        }
+
+        public Variable(Tipo tipo, Object valor, int linea, int columna)
         {
             this.tipo = tipo;
             this.valor = valor;

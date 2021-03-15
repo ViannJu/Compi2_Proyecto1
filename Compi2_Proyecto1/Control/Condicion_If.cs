@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Compi2_Proyecto1.Principales;
 using Compi2_Proyecto1.Analizador;
+using Compi2_Proyecto1.Instrucciones;
 
 namespace Compi2_Proyecto1.Control
 {
@@ -35,7 +36,25 @@ namespace Compi2_Proyecto1.Control
                     ejecutado = true;
                     if (retornar != null)
                     {
-                        return retornar;
+                        if (typeof(Break).IsInstanceOfType(retornar))
+                        {
+
+                            //si viene un break se detiene el flujo del ciclo
+                            return retornar;
+
+                        }
+                        else if (typeof(Continue).IsInstanceOfType(retornar))
+                        {
+
+                            //aqui solo se debe continuar el ciclo
+                            //continue;
+                        }
+                        else if (typeof(Primitivo).IsInstanceOfType(retornar))
+                        {
+
+                            //Aqui devolvemos el valor del retorno
+                            return retornar;
+                        }
                     }
                 }
 

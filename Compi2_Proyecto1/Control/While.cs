@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Compi2_Proyecto1.Analizador;
 using Compi2_Proyecto1.Principales;
+using Compi2_Proyecto1.Instrucciones;
 
 namespace Compi2_Proyecto1.Control
 {
@@ -23,7 +24,7 @@ namespace Compi2_Proyecto1.Control
 
         public override object ejecutar(Entorno ent)
         {
-            //Display.add(InterpreteCompi1.TipoCiclo.Ciclo);
+            MasterClass.Display.AddLast(MasterClass.TipoCiclo.Ciclo);
 
             //obtenemos la expresion de condicion siempre y cuando sea booleana y sea true
             Expresion valor = condicion.getValor(ent);
@@ -43,7 +44,20 @@ namespace Compi2_Proyecto1.Control
 
                     if (retornar != null)
                     {
-                        //Si hay un retorno 
+                        if (typeof(Break).IsInstanceOfType(retornar)) {
+
+                            //si viene un break se detiene el flujo del ciclo
+                            break;
+
+                        } else if (typeof(Continue).IsInstanceOfType(retornar)) {
+
+                            //aqui solo se debe continuar el ciclo
+                            //continue;
+                        } else if (typeof(Primitivo).IsInstanceOfType(retornar)) {
+
+                            //Aqui devolvemos el valor del retorno
+                            return retornar;
+                        }
                     }
 
                     Expresion valor1 = condicion.getValor(nuevo);
@@ -57,7 +71,7 @@ namespace Compi2_Proyecto1.Control
                 MasterClass.Instance.addError(new C_Error("Semantico", "No se puede comparar tipo de dato: " + valor.tipo.tipo, linea, columna));
             }
 
-            //Display.pollLast();
+            MasterClass.Display.RemoveLast();
             return null;
 
         }

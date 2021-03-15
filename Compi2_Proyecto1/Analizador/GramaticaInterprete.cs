@@ -91,6 +91,12 @@ namespace Compi2_Proyecto1.Analizador
             var tfunction = ToTerm("function");
             var tprocedure = ToTerm("procedure");
 
+            var tbreak = ToTerm("break");
+            var tcontinue = ToTerm("continue");
+            var texit = ToTerm("exit");
+
+            var tgraficar_ts = ToTerm("graficar_ts");
+
             #endregion
 
             #region PRIORIDAD
@@ -133,6 +139,10 @@ namespace Compi2_Proyecto1.Analizador
             NonTerminal SENT_REPEAT_UNTIL = new NonTerminal("SENT_REPEAT_UNTIL");
             NonTerminal SENT_FOR = new NonTerminal("SENT_FOR");
 
+            NonTerminal BREAK = new NonTerminal("BREAK");
+            NonTerminal CONTINUE = new NonTerminal("CONTINUE");
+            NonTerminal EXIT = new NonTerminal("EXIT");
+
             NonTerminal DECLARACION_MF = new NonTerminal("DECLARACION_MF");
             NonTerminal L_DECLARACIONES = new NonTerminal("L_DECLARACIONES");
             NonTerminal DECLARACION_ESPECIAL = new NonTerminal("DECLARACION_ESPECIAL");
@@ -144,6 +154,8 @@ namespace Compi2_Proyecto1.Analizador
 
             NonTerminal L_INSTRUCCIONES_PRINCIPALES = new NonTerminal("L_INSTRUCCIONES_PRINCIPALES");
             NonTerminal INSTRUCCION_PRINCIPAL = new NonTerminal("INSTRUCCION_PRINCIPAL");
+
+            NonTerminal GRAFICAR_ENTS = new NonTerminal("GRAFICAR_ENTS");
 
             #endregion
 
@@ -160,6 +172,7 @@ namespace Compi2_Proyecto1.Analizador
                  DECLARACION + ptcoma
                 | DECLARACION_MF + ptcoma
                 | BLOQUE + punto    //El unico bloque independiente es el *Main*
+                | GRAFICAR_ENTS + ptcoma
                 ;
 
             DECLARACION_MF.Rule =
@@ -208,6 +221,20 @@ namespace Compi2_Proyecto1.Analizador
                 |SENT_REPEAT_UNTIL + ptcoma
                 |SENT_FOR + ptcoma
                 |LLAMADA_M + ptcoma
+                |BREAK + ptcoma
+                |CONTINUE + ptcoma
+                |EXIT + ptcoma
+                |GRAFICAR_ENTS + ptcoma
+                ;
+
+            GRAFICAR_ENTS.Rule = tgraficar_ts + parIzquierdo + parDerecho;
+
+            BREAK.Rule = tbreak;
+
+            CONTINUE.Rule = tcontinue;
+
+            EXIT.Rule = texit + parIzquierdo + parDerecho
+                | texit + parIzquierdo + E + parDerecho
                 ;
 
             LLAMADA_M.Rule = L_IDS_Accesos + parIzquierdo + parDerecho

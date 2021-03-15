@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Compi2_Proyecto1.Instrucciones;
 using Compi2_Proyecto1.Principales;
 
 namespace Compi2_Proyecto1.Control
@@ -32,9 +33,26 @@ namespace Compi2_Proyecto1.Control
                 {
                     if (retornar != null)
                     {
-                        return retornar;
+                        if (typeof(Break).IsInstanceOfType(retornar))
+                        {
+
+                            //si viene un break se detiene el flujo del ciclo
+                            return retornar;
+
+                        }
+                        else if (typeof(Continue).IsInstanceOfType(retornar))
+                        {
+
+                            //aqui solo se debe continuar el ciclo
+                            //continue;
+                        }
+                        else if (typeof(Primitivo).IsInstanceOfType(retornar))
+                        {
+
+                            //Aqui devolvemos el valor del retorno
+                            return retornar;
+                        }
                     }
-                    return retornar;
                 }
 
             }
@@ -45,9 +63,26 @@ namespace Compi2_Proyecto1.Control
                 Object retornar = Else.ejecutar(ent1);  //aqui puede que sea new Entorno(ent.anterior, ent.global); para no tomar el del if
                 if (retornar != null)
                 {
-                    return retornar;
+                    if (typeof(Break).IsInstanceOfType(retornar))
+                    {
+
+                        //si viene un break se detiene el flujo del ciclo
+                        return retornar;
+
+                    }
+                    else if (typeof(Continue).IsInstanceOfType(retornar))
+                    {
+
+                        //aqui solo se debe continuar el ciclo
+                        //continue;
+                    }
+                    else if (typeof(Primitivo).IsInstanceOfType(retornar))
+                    {
+
+                        //Aqui devolvemos el valor del retorno
+                        return retornar;
+                    }
                 }
-                return retornar;
             }
             return null;
         }

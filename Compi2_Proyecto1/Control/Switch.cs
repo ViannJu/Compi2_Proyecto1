@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Compi2_Proyecto1.Analizador;
+using Compi2_Proyecto1.Instrucciones;
 using Compi2_Proyecto1.Principales;
 
 namespace Compi2_Proyecto1.Control
@@ -57,17 +58,29 @@ namespace Compi2_Proyecto1.Control
                             this.execUno = true;
                             //si entramos, ejecutamos ese bloque
                             Entorno nuevo = new Entorno(ent);
-                            Object retorno = block.ejecutar(nuevo);
-                            return retorno; //tengo duda si poner este porque asi cualquiera que haga match se puede ejecutar
-                            /*
-                            //por si viene algun break
-                            if (retorno != null)
+                            Object retornar = block.ejecutar(nuevo);
+                            if (retornar != null)
                             {
+                                if (typeof(Break).IsInstanceOfType(retornar))
+                                {
 
-                                //Validaciones para break y continue
+                                    //si viene un break se detiene el flujo del ciclo
+                                    break;
 
+                                }
+                                else if (typeof(Continue).IsInstanceOfType(retornar))
+                                {
+
+                                    //aqui solo se debe continuar el ciclo
+                                    //continue;
+                                }
+                                else if (typeof(Primitivo).IsInstanceOfType(retornar))
+                                {
+
+                                    //Aqui devolvemos el valor del retorno
+                                    return retornar;
+                                }
                             }
-                            */
                         }
                     }
                 }

@@ -56,12 +56,29 @@ namespace Compi2_Proyecto1.Control
 
                     //creamos un nuevo entorno para ejecutar las instrucciones del bloque
                     Entorno ent3 = new Entorno(entIntermedio);
-                    Object retorno = this.instrucciones.ejecutar(ent3);
+                    Object retornar = this.instrucciones.ejecutar(ent3);
 
-                    if (retorno != null)
+                    if (retornar != null)
                     {
+                        if (typeof(Break).IsInstanceOfType(retornar))
+                        {
 
+                            //si viene un break se detiene el flujo del ciclo
+                            break;
 
+                        }
+                        else if (typeof(Continue).IsInstanceOfType(retornar))
+                        {
+
+                            //aqui solo se debe continuar el ciclo
+                            //continue;
+                        }
+                        else if (typeof(Primitivo).IsInstanceOfType(retornar))
+                        {
+
+                            //Aqui devolvemos el valor del retorno
+                            return retornar;
+                        }
                     }
 
                     Tipo tempTipo = new Tipo(Tipo.enumTipo.entero);

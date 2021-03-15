@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 using Compi2_Proyecto1.Analizador;
+using Compi2_Proyecto1.Instrucciones;
 using Compi2_Proyecto1.Principales;
 
 namespace Compi2_Proyecto1.Control
@@ -44,9 +45,30 @@ namespace Compi2_Proyecto1.Control
 
                 foreach (Instruccion ins in this.listaInstrucciones) {
 
-                    Object retorno = ins.ejecutar(nuevo);
+                    Object retornar = ins.ejecutar(nuevo);
                     /*Aqui van las validaciones para cuando el return no sea nulo*/
+                    if (retornar != null)
+                    {
+                        if (typeof(Break).IsInstanceOfType(retornar))
+                        {
 
+                            //si viene un break se detiene el flujo del ciclo
+                            break;
+
+                        }
+                        else if (typeof(Continue).IsInstanceOfType(retornar))
+                        {
+
+                            //aqui solo se debe continuar el ciclo
+                            //continue;
+                        }
+                        else if (typeof(Primitivo).IsInstanceOfType(retornar))
+                        {
+
+                            //Aqui devolvemos el valor del retorno
+                            return retornar;
+                        }
+                    }
 
                 }
 

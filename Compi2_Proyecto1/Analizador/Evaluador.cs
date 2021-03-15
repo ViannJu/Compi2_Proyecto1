@@ -70,6 +70,15 @@ namespace Compi2_Proyecto1.Analizador
 
             switch (nodo.ChildNodes[0].Term.Name) {
 
+                case "GRAFICAR_ENTS":
+                    //tgraficar_ts + parIzquierdo + parDerecho  <-- Mandamos a llamar a la clase graficar Entornos;
+                    Instruccion tempGrafica;
+                    tempGrafica = new Graficar_ts();
+
+                    MasterClass.Instance.addInstruction(tempGrafica);
+
+                    break;
+
                 case "BLOQUE":
                     //entonces el bloque tiene instrucciones
                     if (nodo.ChildNodes[0].ChildNodes.Count == 3)
@@ -427,6 +436,99 @@ namespace Compi2_Proyecto1.Analizador
 
             //Como se llama la instruccion que viene
             switch (nodo.ChildNodes[0].Term.Name) {
+
+                case "GRAFICAR_ENTS":
+                    //tgraficar_ts + parIzquierdo + parDerecho  <-- Mandamos a llamar a la clase graficar Entornos;
+                    Instruccion tempGrafica;
+                    tempGrafica = new Graficar_ts();
+
+                    //Si es un bloque se guarda en la lista de instrucciones de bloque
+                    if (bloque)
+                    {
+                        guardadosInstruccion.AddLast(tempGrafica);
+                    }
+                    //Si no es un bloque es la lista general de instrucciones de MasterClass
+                    else
+                    {
+                        //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                        MasterClass.Instance.addInstruction(tempGrafica);
+                        //MessageBox.Show("guarde el bloque en la masterclass");
+                    }
+                    break;
+
+                case "BREAK":
+
+                    //creamos el objeto instruccion
+                    Instruccion tempBreak;
+                    tempBreak = new Break(0,0);
+
+                    //Si es un bloque se guarda en la lista de instrucciones de bloque
+                    if (bloque)
+                    {
+                        guardadosInstruccion.AddLast(tempBreak);
+                    }
+                    //Si no es un bloque es la lista general de instrucciones de MasterClass
+                    else
+                    {
+                        //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                        MasterClass.Instance.addInstruction(tempBreak);
+                        //MessageBox.Show("guarde el bloque en la masterclass");
+                    }
+                    break;
+
+                case "CONTINUE":
+
+                    //creamos el objeto instruccion
+                    Instruccion tempContinue;
+                    tempContinue = new Continue(0,0);
+
+                    //Si es un bloque se guarda en la lista de instrucciones de bloque
+                    if (bloque)
+                    {
+                        guardadosInstruccion.AddLast(tempContinue);
+                    }
+                    //Si no es un bloque es la lista general de instrucciones de MasterClass
+                    else
+                    {
+                        //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                        MasterClass.Instance.addInstruction(tempContinue);
+                        //MessageBox.Show("guarde el bloque en la masterclass");
+                    }
+                    break;
+
+                case "EXIT":
+
+                    //texit + parIzquierdo + parDerecho
+                    if (nodo.ChildNodes[0].ChildNodes.Count == 3) {
+
+
+                    }
+                    //texit + parIzquierdo + E + parDerecho
+                    else if (nodo.ChildNodes[0].ChildNodes.Count == 4) {
+
+                        //Mandamos a traer la expresion
+                        Expresion expExpresion = evaluarExpresion(nodo.ChildNodes[0].ChildNodes[2]);
+
+                        //creamos el objeto exit
+                        Instruccion tempExit;
+                        tempExit = new Exit(0,0,expExpresion);
+
+                        //Si es un bloque se guarda en la lista de instrucciones de bloque
+                        if (bloque)
+                        {
+                            guardadosInstruccion.AddLast(tempExit);
+                        }
+                        //Si no es un bloque es la lista general de instrucciones de MasterClass
+                        else
+                        {
+                            //mandarle a declaracion -> se guarda en una lista de instrucciones para su ejecucion en la master class
+                            MasterClass.Instance.addInstruction(tempExit);
+                            //MessageBox.Show("guarde el bloque en la masterclass");
+                        }
+
+                    }
+                    
+                    break;
 
                 case "LLAMADA_M":
                     //L_IDS_Accesos + parIzquierdo + parDerecho

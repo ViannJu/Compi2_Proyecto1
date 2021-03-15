@@ -32,6 +32,9 @@ namespace Compi2_Proyecto1.Analizador
          * @param salto: indica si existe salto de linea 
          */
 
+
+
+
         public enum TipoCiclo
         {
             //los tipos de primitivos
